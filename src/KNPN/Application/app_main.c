@@ -25,7 +25,7 @@
 #include "DWT_Delay/dwt_delay.h"
 #include "structs.h"
 
-
+/*
 typedef struct paket_1{
 	uint8_t flag;
 	uint32_t time_pak;
@@ -41,7 +41,7 @@ typedef struct paket_1{
 	int16_t lsm_g_z;
 	uint16_t crc;
 }paket_1;
-
+*/
 
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
@@ -150,7 +150,7 @@ int app_main(){
 	pack1_t pack1 = {0};
 	pack1.flag = 0xAA;
 
-
+int a;
 	while(1){
 
 
@@ -178,6 +178,7 @@ int app_main(){
 			pack1.crc = 0;
 
 			nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
+			nrf24_irq_get(&nrf24,&a);
 			nrf24_fifo_flush_tx(&nrf24);
 
 
