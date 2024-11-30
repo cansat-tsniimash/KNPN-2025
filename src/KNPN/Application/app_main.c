@@ -26,23 +26,6 @@
 #include "structs.h"
 
 
-typedef struct paket_1{
-	uint8_t flag;
-	uint32_t time_pak;
-	uint16_t n;
-	int16_t lis_x;
-	int16_t lis_y;
-	int16_t lis_z;
-	int16_t lsm_a_x;
-	int16_t lsm_a_y;
-	int16_t lsm_a_z;
-	int16_t lsm_g_x;
-	int16_t lsm_g_y;
-	int16_t lsm_g_z;
-	uint16_t crc;
-}paket_1;
-
-
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
 extern I2C_HandleTypeDef hi2c1;
@@ -59,6 +42,7 @@ int app_main(){
 	float temperature_celsius_gyro = 0.0;
 	uint16_t num1 = 0 ;
 	uint16_t crc = 0;
+
 //сдвиговый регистр
 	shift_reg_t shift_reg_r;
 	shift_reg_r.bus = &hspi1;
@@ -150,14 +134,14 @@ int app_main(){
 	pack1_t pack1 = {0};
 	pack1.flag = 0xAA;
 
-
+int a;
 	while(1){
 
-
+		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
 		bmp_press = bme_shit.pressure;
 		bmp_humidity = bme_shit.humidity;
-		its_bme280_read(UNKNOWN_BME, &bme_shit);
+
 		lsmread(&ctx_lsm, &temperature_celsius_gyro, &acc_g, &gyro_dps);
 		lisread(&ctx_lis, &temperature_celsius_mag, &mag);
 
@@ -178,7 +162,8 @@ int app_main(){
 			pack1.crc = 0;
 
 			nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
-			nrf24_fifo_flush_tx(&nrf24);
+			nrf24_irq_get(&nrf24,&a);
+			//nrf24_fifo_flush_tx(&nrf24);
 
 
 	}
