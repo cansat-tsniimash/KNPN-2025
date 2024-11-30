@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.4.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="10" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="yes"/>
@@ -1555,6 +1555,13 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <text x="-3.5" y="0" size="0.8" layer="25" rot="R90" align="bottom-center">&gt;NAME</text>
 <text x="-1.5" y="0" size="0.8" layer="21" ratio="15" rot="R90" align="bottom-center">&gt;VALUE</text>
 </package>
+<package name="BOARD_SHAPE">
+<circle x="40" y="40" radius="38" width="0.01" layer="20"/>
+<circle x="8.5" y="28.371" radius="1.65" width="0.01" layer="20"/>
+<circle x="51.629" y="8.05" radius="1.65" width="0.01" layer="20"/>
+<circle x="71.95" y="51.629" radius="1.65" width="0.01" layer="20"/>
+<circle x="28.371" y="71.95" radius="1.65" width="0.01" layer="20"/>
+</package>
 </packages>
 <packages3d>
 <package3d name="255SB" urn="urn:adsk.eagle:package:27679/1" type="box">
@@ -2343,6 +2350,13 @@ distributor Buerklin, 11G810</description>
 <text x="1.016" y="-4.191" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="1" x="0" y="2.54" visible="off" length="short" direction="pas" swaplevel="1" rot="R270"/>
 <pin name="2" x="0" y="-5.08" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
+</symbol>
+<symbol name="BOARD_SHAPE">
+<circle x="0" y="0" radius="10.77630625" width="0.254" layer="94"/>
+<circle x="-5.08" y="5.08" radius="2.54" width="0.254" layer="94"/>
+<circle x="5.08" y="5.08" radius="2.54" width="0.254" layer="94"/>
+<circle x="5.08" y="-5.08" radius="2.54" width="0.254" layer="94"/>
+<circle x="-5.08" y="-5.08" radius="2.54" width="0.254" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3459,6 +3473,18 @@ Source: &lt;a href="https://www.hirose.com/product/document?clcode=CL0331-0472-2
 <connect gate="G$1" pin="1" pad="P$1"/>
 <connect gate="G$1" pin="2" pad="P$2"/>
 </connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="BOARD_SHAPE">
+<gates>
+<gate name="G$1" symbol="BOARD_SHAPE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="BOARD_SHAPE">
 <technologies>
 <technology name=""/>
 </technologies>
