@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.4.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -2342,9 +2342,9 @@ design rules under a new name.</description>
 <attribute name="NAME" x="37.32" y="45.66" size="1.27" layer="25"/>
 <attribute name="VALUE" x="37.32" y="24.07" size="1.27" layer="27"/>
 </element>
-<element name="S1" library="UNKNOWN-2024" package="SS_12D11" value="" x="36" y="72" smashed="yes" rot="R30">
-<attribute name="NAME" x="25.111884375" y="77.902759375" size="1.27" layer="25" ratio="10" rot="R30"/>
-<attribute name="VALUE" x="30.721996875" y="81.141759375" size="1.27" layer="27" ratio="10" rot="R30"/>
+<element name="S1" library="UNKNOWN-2024" package="SS_12D11" value="" x="24" y="64" smashed="yes" rot="R60">
+<attribute name="NAME" x="11.61923125" y="63.66788125" size="1.27" layer="25" ratio="10" rot="R60"/>
+<attribute name="VALUE" x="14.85823125" y="69.27799375" size="1.27" layer="27" ratio="10" rot="R60"/>
 </element>
 <element name="X2" library="UNKNOWN-2024" package="JST-3-2.5" value="AKKUM" x="76.3" y="23.6" smashed="yes">
 <attribute name="NAME" x="79.84" y="23.6" size="1.016" layer="25" rot="R270" align="bottom-center"/>
@@ -2601,7 +2601,7 @@ design rules under a new name.</description>
 <wire x1="64.10739375" y1="72.1" x2="70.13208125" y2="72.1" width="0.3" layer="16"/>
 <contactref element="S1" pad="2"/>
 <wire x1="77.11370625" y1="66" x2="77.3" y2="66.35" width="0" layer="19" extent="16-16"/>
-<wire x1="36" y1="72" x2="60.15" y2="61.6" width="0" layer="19" extent="16-16"/>
+<wire x1="24" y1="64" x2="52.6" y2="66.725" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="N$9">
 <contactref element="C3" pad="2"/>
@@ -2819,7 +2819,7 @@ design rules under a new name.</description>
 <signal name="BUS+_OUT">
 <contactref element="X2" pad="1"/>
 <contactref element="S1" pad="3"/>
-<wire x1="40.07031875" y1="74.35" x2="78.82" y2="23.6" width="0" layer="19" extent="1-1"/>
+<wire x1="26.35" y1="68.07031875" x2="78.82" y2="23.6" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_GPS">
 <contactref element="GPS-NEO7M" pad="P$3"/>

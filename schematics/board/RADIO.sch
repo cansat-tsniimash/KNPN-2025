@@ -12397,11 +12397,6 @@ Source: AVX .. aphvc.pdf</description>
 </net>
 <net name="C0" class="0">
 <segment>
-<wire x1="-48.26" y1="35.56" x2="-68.58" y2="35.56" width="0.1524" layer="91"/>
-<label x="-68.58" y="35.56" size="1.778" layer="95"/>
-<pinref part="JP2" gate="A" pin="1"/>
-</segment>
-<segment>
 <wire x1="-38.1" y1="63.5" x2="-71.12" y2="63.5" width="0.1524" layer="91"/>
 <label x="-71.12" y="63.5" size="1.778" layer="95"/>
 <pinref part="JP4" gate="A" pin="13"/>
@@ -12557,6 +12552,13 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="-38.1" y1="66.04" x2="-71.12" y2="66.04" width="0.1524" layer="91"/>
 <label x="-71.12" y="66.04" size="1.778" layer="95"/>
 <pinref part="JP4" gate="A" pin="12"/>
+</segment>
+</net>
+<net name="CO" class="0">
+<segment>
+<wire x1="-48.26" y1="35.56" x2="-68.58" y2="35.56" width="0.1524" layer="91"/>
+<label x="-68.58" y="35.56" size="1.778" layer="95"/>
+<pinref part="JP2" gate="A" pin="1"/>
 </segment>
 </net>
 </nets>
