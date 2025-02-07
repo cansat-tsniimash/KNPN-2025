@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.4.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -10217,7 +10217,7 @@ Source: www.kingbright.com</description>
 </packages>
 <symbols>
 <symbol name="LOGO">
-<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2024 - </text>
+<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2025 - </text>
 <text x="104.14" y="0" size="12.7" layer="96">&gt;VALUE</text>
 </symbol>
 </symbols>

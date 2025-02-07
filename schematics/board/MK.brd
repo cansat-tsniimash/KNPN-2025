@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.4.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="no" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -2558,7 +2558,7 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="R" x="68" y="19.9" size="1.778" layer="27" rot="R134" display="off"/>
 <attribute name="VALUE" x="66.633459375" y="22.611453125" size="1" layer="27" font="vector" ratio="15" rot="R224"/>
 </element>
-<element name="STM" library="UNKNOWN-2024" package="STM32F411_BOARD" value="STM32F411_BOARD" x="49.4" y="41.6" smashed="yes" rot="R90"/>
+<element name="STM32F411" library="UNKNOWN-2024" package="STM32F411_BOARD" value="STM32F411_BOARD" x="49.4" y="41.6" smashed="yes" rot="R90"/>
 <element name="BME280" library="UNKNOWN-2024" package="BME280-PINS-ONLY" value="BME280BME280-PINS-ONLY" x="28.6" y="53.4" smashed="yes">
 <attribute name="NAME" x="23.28" y="48.49" size="1" layer="25" font="vector" ratio="15" rot="R90"/>
 </element>
@@ -2604,41 +2604,17 @@ design rules under a new name.</description>
 <element name="U$14" library="UNKNOWN-2024" package="AD5593" value="AD5593" x="-2.275" y="-278.6" smashed="yes">
 <attribute name="NAME" x="-4.275" y="-275" size="0.8" layer="25"/>
 </element>
-<element name="R0" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="73.8" y="35.7" smashed="yes">
+<element name="R0" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="2k2" x="73.8" y="35.7" smashed="yes">
 <attribute name="NAME" x="73.165" y="36.335" size="1.27" layer="25"/>
 <attribute name="POPULARITY" value="77" x="73.8" y="35.7" size="1.778" layer="27" display="off"/>
 <attribute name="SPICEPREFIX" value="R" x="73.8" y="35.7" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="73.165" y="33.795" size="1.27" layer="27"/>
 </element>
-<element name="R7" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="4.1" y="36" smashed="yes">
+<element name="R7" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="2k2" x="4.1" y="36" smashed="yes">
 <attribute name="NAME" x="3.465" y="36.635" size="1.27" layer="25"/>
 <attribute name="POPULARITY" value="77" x="-3.2" y="44.1" size="1.778" layer="27" display="off"/>
 <attribute name="SPICEPREFIX" value="R" x="-3.2" y="44.1" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="3.465" y="34.095" size="1.27" layer="27"/>
-</element>
-<element name="R8" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="35.2" y="73.9" smashed="yes">
-<attribute name="NAME" x="34.565" y="74.535" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="27.9" y="82" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="27.9" y="82" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="34.565" y="71.995" size="1.27" layer="27"/>
-</element>
-<element name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="45" y="5.4" smashed="yes">
-<attribute name="NAME" x="44.365" y="6.035" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="37.7" y="13.5" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="37.7" y="13.5" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="44.365" y="3.495" size="1.27" layer="27"/>
-</element>
-<element name="R12" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-66" y="-58.3" smashed="yes">
-<attribute name="NAME" x="-66.635" y="-57.665" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-73.3" y="-50.2" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-73.3" y="-50.2" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-66.635" y="-60.205" size="1.27" layer="27"/>
-</element>
-<element name="R13" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-66" y="-71.3" smashed="yes">
-<attribute name="NAME" x="-66.635" y="-70.665" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-73.3" y="-63.2" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-73.3" y="-63.2" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-66.635" y="-73.205" size="1.27" layer="27"/>
 </element>
 <element name="C2" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="100nF" x="-66" y="-102.2" smashed="yes">
 <attribute name="NAME" x="-66.635" y="-101.565" size="1.27" layer="25"/>
@@ -2703,7 +2679,7 @@ design rules under a new name.</description>
 <element name="U$17" library="UNKNOWN-2024" package="SO8" value="IRF7905PBF" x="-70.1" y="-161.3" smashed="yes">
 <attribute name="NAME" x="-73.1988" y="-163.9162" size="1.27" layer="25" ratio="10" rot="R90"/>
 </element>
-<element name="X1" library="UNKNOWN-2024" package="JST-2-2.5" value="JST-2-2.5" x="-70.1" y="-168.5" smashed="yes">
+<element name="PERE1" library="UNKNOWN-2024" package="JST-2-2.5" value="JST-2-2.5" x="-70.1" y="-168.5" smashed="yes">
 <attribute name="NAME" x="-66.56" y="-168.5" size="1.016" layer="25" rot="R270" align="bottom-center"/>
 <attribute name="VALUE" x="-69.1" y="-167.23" size="1.016" layer="27" align="bottom-right"/>
 </element>
@@ -2719,7 +2695,7 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="R" x="-74.2" y="-178.2" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="-74.835" y="-180.105" size="1.27" layer="27"/>
 </element>
-<element name="X2" library="UNKNOWN-2024" package="JST-2-2.5" value="JST-2-2.5" x="-70.1" y="-183.4" smashed="yes">
+<element name="PERE2" library="UNKNOWN-2024" package="JST-2-2.5" value="JST-2-2.5" x="-70.1" y="-183.4" smashed="yes">
 <attribute name="NAME" x="-66.56" y="-183.4" size="1.016" layer="25" rot="R270" align="bottom-center"/>
 <attribute name="VALUE" x="-69.1" y="-182.13" size="1.016" layer="27" align="bottom-right"/>
 </element>
@@ -2735,15 +2711,15 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="R" x="-74.2" y="-193.1" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="-74.835" y="-195.005" size="1.27" layer="27"/>
 </element>
-<element name="U$18" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-199.1" smashed="yes">
+<element name="MOTOR_SP_V" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-199.1" smashed="yes">
 <attribute name="NAME" x="-75.175" y="-197.35" size="1.27" layer="25"/>
 <attribute name="VALUE" x="-74.675" y="-202.35" size="1.27" layer="27"/>
 </element>
-<element name="U$19" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-206.5" smashed="yes">
+<element name="MOTOR_SP_G" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-206.5" smashed="yes">
 <attribute name="NAME" x="-75.175" y="-204.75" size="1.27" layer="25"/>
 <attribute name="VALUE" x="-74.675" y="-209.75" size="1.27" layer="27"/>
 </element>
-<element name="U$20" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-213.9" smashed="yes">
+<element name="FOTO0" library="UNKNOWN-2024" package="53047-02" value="MOLEX-2-1.25" x="-73.3" y="-213.9" smashed="yes">
 <attribute name="NAME" x="-75.175" y="-212.15" size="1.27" layer="25"/>
 <attribute name="VALUE" x="-74.675" y="-217.15" size="1.27" layer="27"/>
 </element>
@@ -2843,54 +2819,6 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="R" x="-92.8" y="-290.3" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="-95.086" y="-290.9858" size="1.27" layer="27" ratio="10"/>
 </element>
-<element name="R39" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-314.6" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-313.965" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-314.6" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-314.6" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-316.505" size="1.27" layer="27"/>
-</element>
-<element name="R40" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-319.5" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-318.865" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-319.5" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-319.5" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-321.405" size="1.27" layer="27"/>
-</element>
-<element name="R41" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-324.4" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-323.765" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-324.4" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-324.4" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-326.305" size="1.27" layer="27"/>
-</element>
-<element name="R42" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-329.3" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-328.665" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-329.3" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-329.3" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-331.205" size="1.27" layer="27"/>
-</element>
-<element name="R43" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-334.2" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-333.565" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-334.2" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-334.2" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-336.105" size="1.27" layer="27"/>
-</element>
-<element name="R44" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-339.1" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-338.465" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-339.1" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-339.1" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-341.005" size="1.27" layer="27"/>
-</element>
-<element name="R45" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-344" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-343.365" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-344" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-344" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-345.905" size="1.27" layer="27"/>
-</element>
-<element name="R46" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1" x="-100" y="-348.9" smashed="yes">
-<attribute name="NAME" x="-100.635" y="-348.265" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="77" x="-100" y="-348.9" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="-100" y="-348.9" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="-100.635" y="-350.805" size="1.27" layer="27"/>
-</element>
 <element name="JP1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X10" package3d_urn="urn:adsk.eagle:package:22406/2" value="" x="-88.2" y="-360.4" smashed="yes">
 <attribute name="NAME" x="-100.9762" y="-358.5712" size="1.27" layer="25" ratio="10"/>
 <attribute name="POPULARITY" value="35" x="-88.2" y="-355" size="1.778" layer="27" display="off"/>
@@ -2908,8 +2836,8 @@ design rules under a new name.</description>
 <contactref element="R9" pad="2"/>
 <contactref element="MICRO_SD" pad="VSS"/>
 <contactref element="R1" pad="2"/>
-<contactref element="STM" pad="39"/>
-<contactref element="STM" pad="19"/>
+<contactref element="STM32F411" pad="39"/>
+<contactref element="STM32F411" pad="19"/>
 <contactref element="BME280" pad="P$3"/>
 <contactref element="U$4" pad="2"/>
 <via x="32.1" y="27.2" extent="1-16" drill="0.35"/>
@@ -2996,7 +2924,7 @@ design rules under a new name.</description>
 <contactref element="U$17" pad="1"/>
 <contactref element="U$17" pad="3"/>
 <contactref element="R24" pad="2"/>
-<contactref element="U$20" pad="1"/>
+<contactref element="FOTO0" pad="1"/>
 <contactref element="U$15" pad="3"/>
 <contactref element="U$22" pad="5"/>
 <contactref element="U$22" pad="2"/>
@@ -3104,24 +3032,20 @@ design rules under a new name.</description>
 <contactref element="U$21" pad="7"/>
 <contactref element="R32" pad="1"/>
 <contactref element="R33" pad="1"/>
-<contactref element="R8" pad="1"/>
-<contactref element="R39" pad="2"/>
 <contactref element="JP2" pad="7"/>
-<wire x1="-99.15" y1="-314.6" x2="-84.35" y2="-365.8" width="0" layer="19" extent="1-1"/>
-<wire x1="-100.55" y1="-258.1" x2="-99.15" y2="-314.6" width="0" layer="19" extent="1-1"/>
-<wire x1="-95.85" y1="-258.1" x2="-100.55" y2="-258.1" width="0" layer="19" extent="1-1"/>
+<wire x1="-95.85" y1="-258.1" x2="-84.35" y2="-365.8" width="0" layer="19" extent="1-1"/>
+<wire x1="-100.55" y1="-258.1" x2="-95.85" y2="-258.1" width="0" layer="19" extent="1-1"/>
 <wire x1="-96.835" y1="-248.17" x2="-95.85" y2="-258.1" width="0" layer="19" extent="1-1"/>
 <wire x1="-100.55" y1="-225.1" x2="-96.835" y2="-248.17" width="0" layer="19" extent="1-1"/>
 <wire x1="-100.55" y1="-220.2" x2="-100.55" y2="-225.1" width="0" layer="19" extent="1-1"/>
 <wire x1="-79.035" y1="-210.17" x2="-100.55" y2="-220.2" width="0" layer="19" extent="1-1"/>
-<wire x1="28.7" y1="42.8" x2="-79.035" y2="-210.17" width="0" layer="19" extent="1-1"/>
-<wire x1="34.35" y1="73.9" x2="32.41" y2="58.73" width="0" layer="19" extent="1-1"/>
+<wire x1="29.9" y1="41.6" x2="-79.035" y2="-210.17" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="3V3">
 <contactref element="MICRO_SD" pad="VDD"/>
 <contactref element="R2" pad="2"/>
-<contactref element="STM" pad="40"/>
-<contactref element="STM" pad="18"/>
+<contactref element="STM32F411" pad="40"/>
+<contactref element="STM32F411" pad="18"/>
 <contactref element="U$4" pad="1"/>
 <via x="67" y="58.2" extent="1-16" drill="0.35"/>
 <contactref element="R3" pad="2"/>
@@ -3172,25 +3096,17 @@ design rules under a new name.</description>
 <wire x1="94.3" y1="27.125" x2="94.3" y2="29.84853125" width="0.4" layer="16"/>
 <wire x1="94.3" y1="29.84853125" x2="93.29853125" y2="30.85" width="0.4" layer="16"/>
 <contactref element="R7" pad="1"/>
-<contactref element="R40" pad="1"/>
-<contactref element="R42" pad="1"/>
-<contactref element="R44" pad="1"/>
-<contactref element="R46" pad="1"/>
 <contactref element="JP2" pad="6"/>
-<wire x1="-100.85" y1="-348.9" x2="-86.89" y2="-365.8" width="0" layer="19" extent="1-1"/>
-<wire x1="-100.85" y1="-339.1" x2="-100.85" y2="-348.9" width="0" layer="19" extent="1-1"/>
-<wire x1="-100.85" y1="-329.3" x2="-100.85" y2="-339.1" width="0" layer="19" extent="1-1"/>
-<wire x1="-100.85" y1="-319.5" x2="-100.85" y2="-329.3" width="0" layer="19" extent="1-1"/>
-<wire x1="-60.9" y1="-129.825" x2="-100.85" y2="-319.5" width="0" layer="19" extent="1-1"/>
+<wire x1="-60.9" y1="-129.825" x2="-86.89" y2="-365.8" width="0" layer="19" extent="1-1"/>
 <wire x1="-60.9" y1="-125.925" x2="-60.9" y2="-129.825" width="0" layer="19" extent="1-1"/>
 <wire x1="-65.15" y1="-121.8" x2="-60.9" y2="-125.925" width="0" layer="19" extent="1-1"/>
 <wire x1="3.25" y1="36" x2="-65.15" y2="-121.8" width="0" layer="19" extent="1-1"/>
 <wire x1="24.02375" y1="25.3544875" x2="3.25" y2="36" width="0" layer="19" extent="1-1"/>
-<wire x1="72.95" y1="35.7" x2="67.4095375" y2="20.5114375" width="0" layer="19" extent="1-1"/>
+<wire x1="72.95" y1="35.7" x2="67" y2="20.920975" width="0" layer="19" extent="1-1"/>
 <wire x1="92.5" y1="31.7" x2="72.95" y2="35.7" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="SCL">
-<contactref element="STM" pad="36"/>
+<contactref element="STM32F411" pad="36"/>
 <contactref element="BME280" pad="P$2"/>
 <via x="51.4" y="67.3718" extent="1-16" drill="0.35"/>
 <wire x1="50.5298" y1="68.242" x2="51.4" y2="67.3718" width="0.3" layer="1"/>
@@ -3215,7 +3131,7 @@ design rules under a new name.</description>
 <wire x1="56.9" y1="55.57" x2="91.9" y2="31.7" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="SDA">
-<contactref element="STM" pad="37"/>
+<contactref element="STM32F411" pad="37"/>
 <contactref element="BME280" pad="P$1"/>
 <wire x1="52.6" y1="67.4" x2="51" y2="69" width="0.3" layer="1"/>
 <via x="52.6" y="67.4" extent="1-16" drill="0.35"/>
@@ -3247,7 +3163,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="CMD_SD">
 <contactref element="MICRO_SD" pad="CMD"/>
-<contactref element="STM" pad="12"/>
+<contactref element="STM32F411" pad="12"/>
 <contactref element="R6" pad="2"/>
 <wire x1="34.487915625" y1="37.79" x2="41.9" y2="37.79" width="0.3" layer="1"/>
 <wire x1="26.442346875" y1="29.741503125" x2="34.487915625" y2="37.79" width="0.3" layer="1"/>
@@ -3256,7 +3172,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="CK_SD">
 <contactref element="MICRO_SD" pad="CLK"/>
-<contactref element="STM" pad="24"/>
+<contactref element="STM32F411" pad="24"/>
 <wire x1="24.745415625" y1="24.52430625" x2="24.431915625" y2="24.213609375" width="0.3" layer="1"/>
 <wire x1="24.431915625" y1="24.213609375" x2="21.9" y2="21.9923625" width="0.3" layer="1"/>
 <wire x1="21.9" y1="21.9923625" x2="21.9" y2="18" width="0.3" layer="1"/>
@@ -3270,7 +3186,7 @@ design rules under a new name.</description>
 <wire x1="56.89" y1="25.1" x2="56.9" y2="25.09" width="0.3" layer="16"/>
 </signal>
 <signal name="OE_SR">
-<contactref element="STM" pad="25"/>
+<contactref element="STM32F411" pad="25"/>
 <contactref element="U$4" pad="8"/>
 <wire x1="67.35" y1="40.46" x2="61.06" y2="40.46" width="0.3" layer="16"/>
 <wire x1="61.06" y1="40.46" x2="61" y2="40.4" width="0.3" layer="16"/>
@@ -3285,7 +3201,7 @@ design rules under a new name.</description>
 <wire x1="56.9" y1="27.63" x2="-60.9" y2="-127.875" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="LATCH_SR">
-<contactref element="STM" pad="23"/>
+<contactref element="STM32F411" pad="23"/>
 <contactref element="U$4" pad="9"/>
 <wire x1="64.65" y1="37.92" x2="62.42" y2="37.92" width="0.3" layer="16"/>
 <wire x1="62.42" y1="37.92" x2="62.4" y2="37.9" width="0.3" layer="16"/>
@@ -3362,7 +3278,7 @@ design rules under a new name.</description>
 <wire x1="19.35" y1="63.16" x2="41.87" y2="63.16" width="0.3" layer="16"/>
 </signal>
 <signal name="D0_SD">
-<contactref element="STM" pad="35"/>
+<contactref element="STM32F411" pad="35"/>
 <contactref element="MICRO_SD" pad="DAT0"/>
 <wire x1="26.18874375" y1="22.863946875" x2="26.12951875" y2="22.807525" width="0.3" layer="1"/>
 <wire x1="26.12951875" y1="22.807525" x2="23.8" y2="20.720484375" width="0.3" layer="1"/>
@@ -3381,7 +3297,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="SWITCH">
 <contactref element="U$2" pad="2"/>
-<contactref element="STM" pad="21"/>
+<contactref element="STM32F411" pad="21"/>
 <contactref element="STATE" pad="A"/>
 <wire x1="64.3" y1="15.257525" x2="65.260546875" y2="14.3" width="0.3" layer="1"/>
 <wire x1="65.260546875" y1="14.3" x2="66.8" y2="14.3" width="0.3" layer="1"/>
@@ -3456,28 +3372,17 @@ design rules under a new name.</description>
 <wire x1="-2.6" y1="-281.5" x2="74.65" y2="35.7" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="CO">
-<contactref element="R8" pad="2"/>
 <contactref element="U$14" pad="P$6"/>
-<wire x1="-1.3" y1="-281.5" x2="36.05" y2="73.9" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="NO2">
-<contactref element="R11" pad="2"/>
 <contactref element="U$14" pad="P$7"/>
 <contactref element="JP2" pad="2"/>
 <wire x1="-0.65" y1="-281.5" x2="-97.05" y2="-365.8" width="0" layer="19" extent="1-1"/>
-<wire x1="45.85" y1="5.4" x2="-0.65" y2="-281.5" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="H3">
-<contactref element="R12" pad="2"/>
-<contactref element="U$14" pad="P$10"/>
-<wire x1="-0.65" y1="-275.7" x2="-65.15" y2="-58.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MICS">
 <contactref element="U$14" pad="P$11"/>
-<contactref element="R13" pad="2"/>
 <contactref element="JP2" pad="4"/>
 <wire x1="-1.3" y1="-275.7" x2="-91.97" y2="-365.8" width="0" layer="19" extent="1-1"/>
-<wire x1="-65.15" y1="-71.3" x2="-1.3" y2="-275.7" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$11">
 <contactref element="U$14" pad="P$8"/>
@@ -3516,21 +3421,21 @@ design rules under a new name.</description>
 </signal>
 <signal name="MOTOR2+">
 <contactref element="U$13" pad="2"/>
-<contactref element="U$19" pad="1"/>
+<contactref element="MOTOR_SP_G" pad="1"/>
 <contactref element="U$15" pad="6"/>
 <wire x1="-72.675" y1="-206.05" x2="-66.7" y2="-126.575" width="0" layer="19" extent="1-1"/>
 <wire x1="-77.765" y1="-210.17" x2="-72.675" y2="-206.05" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR1+">
 <contactref element="U$13" pad="4"/>
-<contactref element="U$18" pad="1"/>
+<contactref element="MOTOR_SP_V" pad="1"/>
 <contactref element="U$21" pad="6"/>
 <wire x1="-72.675" y1="-198.65" x2="-66.7" y2="-127.875" width="0" layer="19" extent="1-1"/>
 <wire x1="-95.565" y1="-248.17" x2="-72.675" y2="-198.65" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOTOR1-">
 <contactref element="U$13" pad="5"/>
-<contactref element="U$18" pad="2"/>
+<contactref element="MOTOR_SP_V" pad="2"/>
 <contactref element="U$21" pad="2"/>
 <wire x1="-73.925" y1="-198.65" x2="-66.7" y2="-128.525" width="0" layer="19" extent="1-1"/>
 <wire x1="-96.835" y1="-254.63" x2="-73.925" y2="-198.65" width="0" layer="19" extent="1-1"/>
@@ -3550,7 +3455,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="MOTOR2-">
 <contactref element="U$13" pad="3"/>
-<contactref element="U$19" pad="2"/>
+<contactref element="MOTOR_SP_G" pad="2"/>
 <contactref element="U$15" pad="2"/>
 <wire x1="-73.925" y1="-206.05" x2="-66.7" y2="-127.225" width="0" layer="19" extent="1-1"/>
 <wire x1="-79.035" y1="-216.63" x2="-73.925" y2="-206.05" width="0" layer="19" extent="1-1"/>
@@ -3606,7 +3511,7 @@ design rules under a new name.</description>
 <signal name="N$20">
 <contactref element="U$17" pad="8"/>
 <contactref element="U$17" pad="7"/>
-<contactref element="X1" pad="2"/>
+<contactref element="PERE1" pad="2"/>
 <wire x1="-72.005" y1="-158.07" x2="-71.35" y2="-168.5" width="0" layer="19" extent="1-1"/>
 <wire x1="-70.735" y1="-158.07" x2="-72.005" y2="-158.07" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -3620,7 +3525,7 @@ design rules under a new name.</description>
 <signal name="N$21">
 <contactref element="U$17" pad="6"/>
 <contactref element="U$17" pad="5"/>
-<contactref element="X2" pad="2"/>
+<contactref element="PERE2" pad="2"/>
 <wire x1="-68.195" y1="-158.07" x2="-69.465" y2="-158.07" width="0" layer="19" extent="1-1"/>
 <wire x1="-71.35" y1="-183.4" x2="-69.465" y2="-158.07" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -3632,7 +3537,7 @@ design rules under a new name.</description>
 <wire x1="-73.35" y1="-193.1" x2="-75.05" y2="-188.2" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="FOTO0">
-<contactref element="U$20" pad="2"/>
+<contactref element="FOTO0" pad="2"/>
 <contactref element="U$14" pad="P$5"/>
 <contactref element="R7" pad="2"/>
 <wire x1="-73.925" y1="-213.45" x2="4.95" y2="36" width="0" layer="19" extent="1-1"/>
@@ -3723,110 +3628,75 @@ design rules under a new name.</description>
 <contactref element="R37" pad="1"/>
 </signal>
 <signal name="CS_LSM">
-<contactref element="STM" pad="26"/>
+<contactref element="STM32F411" pad="26"/>
 <contactref element="JP1" pad="9"/>
 <wire x1="56.9" y1="30.17" x2="-79.31" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="CS_LIS">
-<contactref element="STM" pad="27"/>
+<contactref element="STM32F411" pad="27"/>
 <contactref element="JP1" pad="8"/>
 <wire x1="56.9" y1="32.71" x2="-81.85" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TX_LIDAR">
-<contactref element="STM" pad="28"/>
+<contactref element="STM32F411" pad="28"/>
 <contactref element="JP2" pad="16"/>
 <wire x1="56.9" y1="35.25" x2="-61.49" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_LIDAR">
-<contactref element="STM" pad="29"/>
+<contactref element="STM32F411" pad="29"/>
 <contactref element="JP2" pad="15"/>
 <wire x1="56.9" y1="37.79" x2="-64.03" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TX_RADIO">
-<contactref element="STM" pad="30"/>
+<contactref element="STM32F411" pad="30"/>
 <contactref element="JP1" pad="7"/>
 <wire x1="56.9" y1="40.33" x2="-84.39" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_RADIO">
-<contactref element="STM" pad="31"/>
+<contactref element="STM32F411" pad="31"/>
 <contactref element="JP1" pad="6"/>
 <wire x1="56.9" y1="42.87" x2="-86.93" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MISO_SENS">
-<contactref element="STM" pad="32"/>
+<contactref element="STM32F411" pad="32"/>
 <contactref element="JP1" pad="2"/>
 <wire x1="56.9" y1="45.41" x2="-97.09" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOSI_SENS">
-<contactref element="STM" pad="33"/>
+<contactref element="STM32F411" pad="33"/>
 <contactref element="JP1" pad="1"/>
 <wire x1="56.9" y1="47.95" x2="-99.63" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TX_GPS">
-<contactref element="STM" pad="8"/>
+<contactref element="STM32F411" pad="8"/>
 <contactref element="JP2" pad="13"/>
 <wire x1="41.9" y1="47.95" x2="-69.11" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_GPS">
-<contactref element="STM" pad="9"/>
+<contactref element="STM32F411" pad="9"/>
 <contactref element="JP2" pad="14"/>
 <wire x1="41.9" y1="45.41" x2="-66.57" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCK_SENS">
-<contactref element="STM" pad="11"/>
+<contactref element="STM32F411" pad="11"/>
 <contactref element="JP1" pad="3"/>
 <wire x1="41.9" y1="40.33" x2="-94.55" y2="-360.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M0_RADIO">
-<contactref element="STM" pad="4"/>
+<contactref element="STM32F411" pad="4"/>
 <contactref element="JP2" pad="12"/>
 <wire x1="41.9" y1="58.11" x2="-71.65" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1_RADIO">
-<contactref element="STM" pad="3"/>
+<contactref element="STM32F411" pad="3"/>
 <contactref element="JP2" pad="11"/>
 <wire x1="41.9" y1="60.65" x2="-74.19" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SP-">
 <contactref element="R21" pad="2"/>
 </signal>
-<signal name="N$6">
-<contactref element="R39" pad="1"/>
-<contactref element="R40" pad="2"/>
-<wire x1="-100.85" y1="-314.6" x2="-99.15" y2="-319.5" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$7">
-<contactref element="R41" pad="1"/>
-<contactref element="R42" pad="2"/>
-<wire x1="-100.85" y1="-324.4" x2="-99.15" y2="-329.3" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$8">
-<contactref element="R43" pad="1"/>
-<contactref element="R44" pad="2"/>
-<wire x1="-100.85" y1="-334.2" x2="-99.15" y2="-339.1" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$9">
-<contactref element="R45" pad="1"/>
-<contactref element="R46" pad="2"/>
-<wire x1="-100.85" y1="-344" x2="-99.15" y2="-348.9" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$34">
-<contactref element="R13" pad="1"/>
-<contactref element="R45" pad="2"/>
-<wire x1="-66.85" y1="-71.3" x2="-99.15" y2="-344" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$36">
-<contactref element="R12" pad="1"/>
-<contactref element="R43" pad="2"/>
-<wire x1="-66.85" y1="-58.3" x2="-99.15" y2="-334.2" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$37">
-<contactref element="R11" pad="1"/>
-<contactref element="R41" pad="2"/>
-<wire x1="44.15" y1="5.4" x2="-99.15" y2="-324.4" width="0" layer="19" extent="1-1"/>
-</signal>
 <signal name="AUX_RADIO">
-<contactref element="STM" pad="2"/>
+<contactref element="STM32F411" pad="2"/>
 <contactref element="JP2" pad="10"/>
 <wire x1="41.9" y1="63.19" x2="-76.73" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -3834,8 +3704,8 @@ design rules under a new name.</description>
 <contactref element="JP1" pad="4"/>
 </signal>
 <signal name="4V">
-<contactref element="X2" pad="1"/>
-<contactref element="X1" pad="1"/>
+<contactref element="PERE2" pad="1"/>
+<contactref element="PERE1" pad="1"/>
 <contactref element="JP1" pad="10"/>
 <wire x1="-68.85" y1="-168.5" x2="-68.85" y2="-183.4" width="0" layer="19" extent="1-1"/>
 <wire x1="-76.77" y1="-360.4" x2="-68.85" y2="-183.4" width="0" layer="19" extent="1-1"/>
@@ -3848,6 +3718,8 @@ design rules under a new name.</description>
 </signal>
 <signal name="NH3">
 <contactref element="JP2" pad="3"/>
+<contactref element="U$14" pad="P$10"/>
+<wire x1="-0.65" y1="-275.7" x2="-94.51" y2="-365.8" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GERMO">
 <contactref element="JP2" pad="18"/>
