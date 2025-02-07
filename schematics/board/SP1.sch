@@ -10315,8 +10315,8 @@ Source: www.kingbright.com</description>
 <attribute name="NAME" x="33.02" y="81.7626" size="1.778" layer="95"/>
 <attribute name="VALUE" x="33.02" y="78.9686" size="1.778" layer="96"/>
 </instance>
-<instance part="U$3" gate="G$1" x="-76.2" y="111.76" smashed="yes">
-<attribute name="VALUE" x="27.94" y="111.76" size="12.7" layer="96"/>
+<instance part="U$3" gate="G$1" x="-63.5" y="111.76" smashed="yes">
+<attribute name="VALUE" x="40.64" y="111.76" size="12.7" layer="96"/>
 </instance>
 </instances>
 <busses>

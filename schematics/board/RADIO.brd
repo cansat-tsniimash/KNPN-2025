@@ -338,31 +338,33 @@ distributor Buerklin, 11G810</description>
 <wire x1="2.2" y1="15.4" x2="2.2" y2="10.4" width="0.127" layer="21"/>
 <wire x1="-4" y1="15" x2="-0.1" y2="15" width="0.127" layer="21"/>
 </package>
-<package name="JST-2-2.5">
+<package name="JST-3-2.5">
 <description>
 
 &lt;b&gt;JST PH series header&lt;/b&gt; 2.00mm pitch disconnectable crimp style connectors, through-hole vertical (top entry type), 2 pins&lt;p&gt;
 
 </description>
-<pad name="1" x="1.25" y="0" drill="1" diameter="1.5" shape="octagon"/>
-<pad name="2" x="-1.25" y="0" drill="1" diameter="1.5" shape="octagon"/>
-<text x="3.54" y="0" size="1.016" layer="25" rot="R270" align="bottom-center">&gt;NAME</text>
-<text x="1" y="1.27" size="1.016" layer="27" align="bottom-right">&gt;VALUE</text>
-<wire x1="-3.75" y1="1.6" x2="3.75" y2="1.6" width="0.1524" layer="21"/>
-<wire x1="3.75" y1="1.6" x2="3.75" y2="-2.2" width="0.1524" layer="21"/>
-<wire x1="3.75" y1="-2.2" x2="-3.75" y2="-2.2" width="0.1524" layer="21"/>
-<wire x1="-3.75" y1="-2.2" x2="-3.75" y2="1.6" width="0.1524" layer="21"/>
-<wire x1="-3.75" y1="1.6" x2="3.75" y2="1.6" width="0.1524" layer="51"/>
-<wire x1="3.75" y1="1.6" x2="3.75" y2="-2.2" width="0.1524" layer="51"/>
-<wire x1="3.75" y1="-2.2" x2="2.85" y2="-2.2" width="0.1524" layer="51"/>
-<wire x1="-2.85" y1="-2.2" x2="-3.75" y2="-2.2" width="0.1524" layer="51"/>
-<wire x1="-3.75" y1="-2.2" x2="-3.75" y2="1.6" width="0.1524" layer="51"/>
-<wire x1="-2.85" y1="1.1" x2="2.85" y2="1.1" width="0.1524" layer="51"/>
-<wire x1="-2.85" y1="1.1" x2="-2.85" y2="-2.2" width="0.1524" layer="51"/>
-<wire x1="-2.85" y1="-2.2" x2="2.85" y2="-2.2" width="0.1524" layer="51"/>
-<wire x1="2.85" y1="1.1" x2="2.85" y2="-2.2" width="0.1524" layer="51"/>
-<rectangle x1="1" y1="-0.25" x2="1.5" y2="0.25" layer="51"/>
-<rectangle x1="-1.5" y1="-0.25" x2="-1" y2="0.25" layer="51"/>
+<pad name="1" x="2.52" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<pad name="2" x="0.02" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<text x="6.08" y="0" size="1.016" layer="25" rot="R270" align="bottom-center">&gt;NAME</text>
+<text x="1" y="2.54" size="1.016" layer="27" align="bottom-right">&gt;VALUE</text>
+<wire x1="-5.02" y1="1.6" x2="5.02" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="5.02" y1="1.6" x2="5.02" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="5.02" y1="-2.2" x2="-5.02" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="-5.02" y1="-2.2" x2="-5.02" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="-5.02" y1="1.6" x2="5.02" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="5.02" y1="1.6" x2="5.02" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="5.02" y1="-2.2" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="-2.2" x2="-5.02" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-5.02" y1="-2.2" x2="-5.02" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="1.1" x2="4.12" y2="1.1" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="1.1" x2="-4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="-2.2" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="4.12" y1="1.1" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<rectangle x1="2.27" y1="-0.25" x2="2.77" y2="0.25" layer="51"/>
+<rectangle x1="-0.23" y1="-0.25" x2="0.27" y2="0.25" layer="51"/>
+<pad name="3" x="-2.56" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<rectangle x1="-2.81" y1="-0.25" x2="-2.31" y2="0.25" layer="51"/>
 </package>
 <package name="53047-02" urn="urn:adsk.eagle:footprint:8078152/1">
 <description>&lt;b&gt;1.25mm Pitch PicoBlade™ Wire-to-Board Header, Vertical, with Friction Lock, 2 Circuits&lt;/b&gt;&lt;p&gt;&lt;a href =http://www.molex.com/pdm_docs/sd/530470210_sd.pdf&gt;Datasheet &lt;/a&gt;</description>
@@ -2349,7 +2351,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="67.322" y="86.556" size="1.27" layer="25" ratio="10"/>
 <attribute name="VALUE" x="73.8" y="86.556" size="1.27" layer="27" ratio="10"/>
 </element>
-<element name="X2" library="UNKNOWN-2024" package="JST-2-2.5" value="AKKUM" x="76.3" y="23.6" smashed="yes">
+<element name="X2" library="UNKNOWN-2024" package="JST-3-2.5" value="AKKUM" x="76.3" y="23.6" smashed="yes">
 <attribute name="NAME" x="79.84" y="23.6" size="1.016" layer="25" rot="R270" align="bottom-center"/>
 <attribute name="VALUE" x="77.3" y="24.87" size="1.016" layer="27" align="bottom-right"/>
 </element>
@@ -2486,7 +2488,7 @@ design rules under a new name.</description>
 <wire x1="22.7" y1="38.94" x2="37.32" y2="41.85" width="0" layer="19" extent="1-1"/>
 <wire x1="73.6" y1="27.7" x2="73.6" y2="43.7" width="0" layer="19" extent="1-1"/>
 <wire x1="71.06" y1="27.7" x2="73.6" y2="27.7" width="0" layer="19" extent="1-1"/>
-<wire x1="75.05" y1="23.6" x2="73.6" y2="27.7" width="0" layer="19" extent="1-1"/>
+<wire x1="76.32" y1="23.6" x2="73.6" y2="27.7" width="0" layer="19" extent="1-1"/>
 <wire x1="59.89" y1="27.7" x2="71.06" y2="27.7" width="0" layer="19" extent="1-1"/>
 <wire x1="52.27" y1="27.7" x2="59.89" y2="27.7" width="0" layer="19" extent="1-1"/>
 <wire x1="25.4" y1="65.31" x2="46.83" y2="70.95" width="0" layer="19" extent="1-1"/>
@@ -2550,21 +2552,6 @@ design rules under a new name.</description>
 <wire x1="1.675" y1="-53.25" x2="1.675" y2="-45.85" width="0" layer="19" extent="1-1"/>
 <wire x1="1.675" y1="-60.65" x2="1.675" y2="-53.25" width="0" layer="19" extent="1-1"/>
 <wire x1="16.95" y1="-68.6" x2="1.675" y2="-60.65" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="SCK_SR">
-<contactref element="LSM6DS3" pad="P$4"/>
-<contactref element="U$10" pad="SCL"/>
-<wire x1="22.7" y1="36.4" x2="37.32" y2="39.31" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="MISO_SR">
-<contactref element="U$10" pad="SDO"/>
-<contactref element="LSM6DS3" pad="P$7"/>
-<wire x1="22.7" y1="28.78" x2="37.32" y2="34.23" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="MOSI_SR">
-<contactref element="LSM6DS3" pad="P$5"/>
-<contactref element="U$10" pad="SDA"/>
-<wire x1="22.7" y1="33.86" x2="37.32" y2="36.77" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="BUS+">
 <contactref element="MP1584-3V3" pad="P$2"/>
@@ -2832,7 +2819,7 @@ design rules under a new name.</description>
 <signal name="BUS+_OUT">
 <contactref element="X2" pad="1"/>
 <contactref element="S1" pad="3"/>
-<wire x1="78.5" y1="76" x2="77.55" y2="23.6" width="0" layer="19" extent="1-1"/>
+<wire x1="78.5" y1="76" x2="78.82" y2="23.6" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_GPS">
 <contactref element="GPS-NEO7M" pad="P$3"/>
@@ -2846,25 +2833,33 @@ design rules under a new name.</description>
 </signal>
 <signal name="MOSI_SENS">
 <contactref element="JP1" pad="1"/>
+<contactref element="LSM6DS3" pad="P$5"/>
+<contactref element="U$10" pad="SDA"/>
+<contactref element="U$8" pad="2"/>
+<wire x1="37.32" y1="36.77" x2="42.37" y2="78.6" width="0" layer="19" extent="1-1"/>
+<wire x1="22.7" y1="33.86" x2="37.32" y2="36.77" width="0" layer="19" extent="1-1"/>
+<wire x1="12.59" y1="-74.4" x2="22.7" y2="33.86" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MISO_SENS">
 <contactref element="JP1" pad="2"/>
+<contactref element="LSM6DS3" pad="P$7"/>
+<contactref element="U$10" pad="SDO"/>
+<wire x1="37.32" y1="34.23" x2="44.91" y2="78.6" width="0" layer="19" extent="1-1"/>
+<wire x1="22.7" y1="28.78" x2="37.32" y2="34.23" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCK_SENS">
 <contactref element="JP1" pad="3"/>
+<contactref element="LSM6DS3" pad="P$4"/>
+<contactref element="U$10" pad="SCL"/>
+<contactref element="U$8" pad="3"/>
+<wire x1="37.32" y1="39.31" x2="47.45" y2="78.6" width="0" layer="19" extent="1-1"/>
+<wire x1="22.7" y1="36.4" x2="37.32" y2="39.31" width="0" layer="19" extent="1-1"/>
+<wire x1="10.09" y1="-74.4" x2="22.7" y2="36.4" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="OE">
-<contactref element="JP1" pad="4"/>
-<contactref element="U$8" pad="5"/>
-<wire x1="5.01" y1="-74.4" x2="49.99" y2="78.6" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="LATCH">
-<contactref element="JP1" pad="5"/>
-<contactref element="U$8" pad="4"/>
-<wire x1="7.59" y1="-74.4" x2="52.53" y2="78.6" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="3V7">
+<signal name="4V">
 <contactref element="JP1" pad="10"/>
+<contactref element="X2" pad="3"/>
+<wire x1="73.74" y1="23.6" x2="65.23" y2="78.6" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
 <contactref element="JP2" pad="7"/>
@@ -2917,8 +2912,10 @@ design rules under a new name.</description>
 <wire x1="2.925" y1="-45.85" x2="2.925" y2="-53.25" width="0" layer="19" extent="1-1"/>
 <wire x1="3.6" y1="-38.5" x2="2.925" y2="-45.85" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="SHIFT_2">
+<signal name="SHIFT">
 <contactref element="JP3" pad="17"/>
+<contactref element="U$8" pad="6"/>
+<wire x1="42.35" y1="-68.6" x2="2.51" y2="-74.4" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="RX_LIDAR">
 <contactref element="JP3" pad="15"/>
@@ -2926,14 +2923,15 @@ design rules under a new name.</description>
 <signal name="TX_LIDAR">
 <contactref element="JP3" pad="16"/>
 </signal>
-<signal name="MOSI">
-<contactref element="U$8" pad="2"/>
+<signal name="OE_SR">
+<contactref element="JP1" pad="4"/>
+<contactref element="U$8" pad="5"/>
+<wire x1="5.01" y1="-74.4" x2="49.99" y2="78.6" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="SCK">
-<contactref element="U$8" pad="3"/>
-</signal>
-<signal name="SHIFT2">
-<contactref element="U$8" pad="6"/>
+<signal name="LATCH_SR">
+<contactref element="JP1" pad="5"/>
+<contactref element="U$8" pad="4"/>
+<wire x1="7.59" y1="-74.4" x2="52.53" y2="78.6" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
