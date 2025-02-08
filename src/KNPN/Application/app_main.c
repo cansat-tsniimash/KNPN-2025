@@ -24,13 +24,84 @@
 #include <Photorezistor/photorezistor.h>
 #include "DWT_Delay/dwt_delay.h"
 #include "structs.h"
+#include <fatfs.h>
 
 
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
 extern I2C_HandleTypeDef hi2c1;
 
+
+
+uint16_t Crc16(uint8_t *buf, uint16_t len) {
+	uint16_t crc = 0xFFFF;
+	while (len--) {
+		crc ^= *buf++ << 8;
+		for (uint8_t i = 0; i < 8; i++)
+			crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+	}
+	return crc;
+}
+
+FRESULT mount_again(FIL *File1, FIL *File2, FIL *Fileb, FATFS *fileSystem, const char *path1, const char *path2, const char *pathb){
+	FRESULT is_mount;
+	f_mount(0, "0", 1);
+	extern Disk_drvTypeDef disk;
+	disk.is_initialized[0] = 0;
+	is_mount = f_mount(fileSystem, "", 1);
+	f_open(File1, (char*)path1, FA_WRITE | FA_OPEN_APPEND);
+	f_open(File2, (char*)path2, FA_WRITE | FA_OPEN_APPEND);
+	f_open(Fileb, (char*)pathv, FA_WRITE | FA_OPEN_APPEND);
+	return is_mount;
+}
+
+FATFS fileSystem; // переменная типа FATFS
+FIL File1; // хендлер файла
+FIL File2;
+FIL Fileb;
+const char path1[] = "packet1.csv";
+const char path2[] = "packet2.csv";
+const char pathv[] = "packetv.csv";
+
+FRESULT is_mount = 0;
+int needs_mount = 0;
+
+FRESULT res1 = 255;
+FRESULT res2 = 255;
+FRESULT resb = 255;
+
 int app_main(){
+
+//файлы
+
+	memset(&fileSystem, 0x00, sizeof(fileSystem));
+
+	extern Disk_drvTypeDef disk;
+	disk.is_initialized[0] = 0;
+	is_mount = f_mount(&fileSystem, "", 1);
+
+	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
+		res1 = f_open(&File1, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		needs_mount = needs_mount || res1 != FR_OK;
+		f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar;\n", &File1);
+		res1 = f_sync(&File1);
+		needs_mount = needs_mount || res1 != FR_OK;
+	}
+	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
+		res2 = f_open(&File2, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		needs_mount = needs_mount || res2 != FR_OK;
+		f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File2);
+		res2 = f_sync(&File2);
+		needs_mount = needs_mount || res2 != FR_OK;
+	}
+	if(is_mount == FR_OK){
+		resb = f_open(&Fileb, pathb, FA_WRITE | FA_OPEN_APPEND);
+		needs_mount = needs_mount || resb != FR_OK;
+	}
+
+
+
+
 
 	double bmp_temp;
 	double bmp_press;
