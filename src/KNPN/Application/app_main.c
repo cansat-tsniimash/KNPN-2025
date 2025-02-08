@@ -31,7 +31,12 @@ extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
 extern I2C_HandleTypeDef hi2c1;
 
-
+typedef enum
+{
+	SD_PACK_1,
+	SD_PACK_2,
+	SD_WAIT,
+}sd_state_t;
 
 uint16_t Crc16(uint8_t *buf, uint16_t len) {
 	uint16_t crc = 0xFFFF;
@@ -43,25 +48,28 @@ uint16_t Crc16(uint8_t *buf, uint16_t len) {
 	return crc;
 }
 
-FRESULT mount_again(FIL *File1, FIL *File2, FIL *Fileb, FATFS *fileSystem, const char *path1, const char *path2, const char *pathb){
+FRESULT mount_again(FIL *File1, FIL *File2, FIL *Fileb, FATFS *fileSystem, const char *pack1, const char *pack2, const char *pathb){
 	FRESULT is_mount;
 	f_mount(0, "0", 1);
 	extern Disk_drvTypeDef disk;
 	disk.is_initialized[0] = 0;
 	is_mount = f_mount(fileSystem, "", 1);
-	f_open(File1, (char*)path1, FA_WRITE | FA_OPEN_APPEND);
-	f_open(File2, (char*)path2, FA_WRITE | FA_OPEN_APPEND);
-	f_open(Fileb, (char*)pathv, FA_WRITE | FA_OPEN_APPEND);
+	f_open(File1, (char*)pack1, FA_WRITE | FA_OPEN_APPEND);
+	f_open(File2, (char*)pack2, FA_WRITE | FA_OPEN_APPEND);
+	f_open(Fileb, (char*)pathb, FA_WRITE | FA_OPEN_APPEND);
 	return is_mount;
 }
 
 FATFS fileSystem; // переменная типа FATFS
 FIL File1; // хендлер файла
-FIL File2;
-FIL Fileb;
-const char path1[] = "packet1.csv";
-const char path2[] = "packet2.csv";
-const char pathv[] = "packetv.csv";
+FIL File2; // хендлер файла
+FIL Fileb; // хендлер файла
+FIL File_1csv; // хендлер файла
+FIL File_2csv; // хендлер файла
+FIL File_3csv; // хендлер файла
+const char pack1[] = "packet1.csv";
+const char pack2[] = "packet2.csv";
+const char pathb[] = "packetb.csv";
 
 FRESULT is_mount = 0;
 int needs_mount = 0;
@@ -69,6 +77,35 @@ int needs_mount = 0;
 FRESULT res1 = 255;
 FRESULT res2 = 255;
 FRESULT resb = 255;
+FRESULT res1csv; // результат выполнения функции
+FRESULT res2csv; // результат выполнения функции
+FRESULT resvcsv; // результат выполнения функции
+FRESULT resm; // результат выполнения функции
+char str_buf[300];
+
+uint16_t sd_parse_to_bytes_pac1(char *buffer, pack1_t *pack1) {
+    memset(buffer, 0, 300);
+    uint16_t num_written = snprintf(
+            buffer, 300,
+			"%d;%d;%d;%ld;%d;%d;%d;%ld;%d;%f;%f;%f;%d;%d;%d\n",
+			pack1->flag,pack1->num,pack1->accl[0],pack1->accl[1],pack1->accl[2],pack1->time_ms,
+			pack1->gyro[0],pack1->gyro[1],pack1->gyro[2],pack1->mag[0],
+			pack1->mag[1],pack1->mag[2],pack1->bme_temp,pack1->bme_press,pack1->bme_humidity,pack1->bme_height,
+			pack1->lux_board,pack1->lux_sp,pack1->state,pack1->lidar,pack1->crc);
+    return num_written;
+}
+uint16_t sd_parse_to_bytes_pac2(char *buffer, pack2_t *pack2) {
+    memset(buffer, 0, 300);
+    uint16_t num_written = snprintf(
+            buffer, 300,
+            "%d;%d;%ld;%d;%f;%f;%f;%ld;4%f;%d;%d;%d;%d;%d;%d;%d;%d;%ld;%d;%d\n",
+			pack2->flag,pack2->num,pack2->time_ms,pack2->fix,pack2->lat,
+			pack2->lon,pack2->alt,pack2->gps_time_s,pack2->current,pack2->bus_voltage,
+			pack2->MICS_5524,pack2->MICS_CO,pack2->MICS_NO2,pack2->MICS_NH3,pack2->CCS_CO2,
+			pack2->CCS_TVOC,pack2->bme_temp_g,pack2->bme_press_g,pack2->bme_humidity_g,pack2->crc);
+    return num_written;
+}
+
 
 int app_main(){
 
@@ -81,14 +118,14 @@ int app_main(){
 	is_mount = f_mount(&fileSystem, "", 1);
 
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res1 = f_open(&File1, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		res1 = f_open(&File1, (char*)pack1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res1 != FR_OK;
 		f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar;\n", &File1);
 		res1 = f_sync(&File1);
 		needs_mount = needs_mount || res1 != FR_OK;
 	}
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res2 = f_open(&File2, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		res2 = f_open(&File2, (char*)pack2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res2 != FR_OK;
 		f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File2);
 		res2 = f_sync(&File2);
@@ -106,14 +143,14 @@ int app_main(){
 	double bmp_temp;
 	double bmp_press;
 	double bmp_humidity;
+	float height;
 	float acc_g[3] = {0};
 	float gyro_dps[3] = {0};
 	float mag[3] = {0};
 	float temperature_celsius_mag = 0.0;
 	float temperature_celsius_gyro = 0.0;
 	uint16_t num1 = 0 ;
-	uint16_t crc = 0;
-
+	uint16_t num2 = 0 ;
 //сдвиговый регистр
 	shift_reg_t shift_reg_r;
 	shift_reg_r.bus = &hspi1;
@@ -202,16 +239,22 @@ int app_main(){
 	int16_t magg[3];
 	int16_t gyro[3];
 	int16_t acc_raw[3];
-	pack1_t pack1 = {0};
-	pack1.flag = 0xAA;
 
-int a;
+	pack1_t pack1 = {0};
+	pack2_t pack2 = {0};
+
+	int a;
+	uint Bytes;
+	uint16_t num_written;
+
 	while(1){
 
 		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
 		bmp_press = bme_shit.pressure;
 		bmp_humidity = bme_shit.humidity;
+		double ground_pressure = bme_shit.pressure;
+		height = 44330 * (1 - pow(bmp_press / ground_pressure, 1.0 / 5.255));
 
 		lsmread(&ctx_lsm, &temperature_celsius_gyro, &acc_g, &gyro_dps);
 		lisread(&ctx_lis, &temperature_celsius_mag, &mag);
@@ -227,18 +270,100 @@ int a;
 			pack1.mag[i] = magg[i];
 		}
 
-			num1 += 1;
-			pack1.num = num1;
-			pack1.time_ms = HAL_GetTick();
-			pack1.crc = 0;
 
-			nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
-			nrf24_irq_get(&nrf24,&a);
-			//nrf24_fifo_flush_tx(&nrf24);
+			pack1.flag = 0xAA;
+			pack1.bme_height = height;
+			pack1.bme_humidity = bmp_humidity;
+			pack1.bme_press = bmp_press;
+			pack1.bme_temp = bmp_temp;
+			pack1.lidar = 666;
+			pack1.lux_board = 666;
+			pack1.lux_sp = 666;
+			pack1.state = 666;
+
+			num2 += 1;
+			pack2.flag = 0xBB;
+			pack2.num = num2;
+			pack2.time_ms = HAL_GetTick();
+			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
+			pack2.MICS_CO = 666;
+			pack2.MICS_NH3 = 666;
+			pack2.MICS_NO2 = 666;
+			pack2.MICS_5524 = 666;
+			pack2.CCS_TVOC = 666;
+			pack2.CCS_CO2 = 666;
+			pack2.lat = 666;
+			pack2.lon = 666;
+			pack2.alt = 666;
+			pack2.gps_time_s = 666;
+			pack2.fix = 666;
+			pack2.bme_humidity_g = 666;
+			pack2.bme_press_g = 666;
+			pack2.bme_temp_g = 666;
+			pack2.bus_voltage = 666;
+			pack2.current = 666;
+
+			sd_state_t sd_state = SD_PACK_1;
+
+			num1 += 1;
+			num2 += 1;
+
+			switch(sd_state) {
+				case SD_PACK_1:
+					pack1.num = num1;
+					pack1.time_ms = HAL_GetTick();
+					pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+
+					if (is_mount == FR_OK){
+						res1 = f_write(&File1,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
+						res1 = f_sync(&File1); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+
+						num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
+
+						res1csv = f_write(&File_1csv,str_buf,num_written, &Bytes); // отправка на запись в файл
+						res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					}
+					a++;
+					sd_state = SD_WAIT;
+				break;
+
+				case SD_PACK_2:
+					pack2.num = num2;
+					pack2.time_ms = HAL_GetTick();
+					pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
+
+					if (is_mount == FR_OK){
+						res2 = f_write(&File2,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
+						res2 = f_sync(&File2); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+
+
+						num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
+
+						res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
+						res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					}
+					a=0;
+				break;
+
+				case SD_WAIT:
+					if(a == 4)
+						sd_state = SD_PACK_2;
+					else
+						sd_state = SD_PACK_1;
+
+				break;
+
+
+
+
+
 
 
 	}
-
+			//nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
+			//nrf24_irq_get(&nrf24,&a);
+			//nrf24_fifo_flush_tx(&nrf24);
+	}
 	return 0;
-
 }
+
