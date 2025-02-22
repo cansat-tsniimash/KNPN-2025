@@ -30,6 +30,7 @@
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
 extern I2C_HandleTypeDef hi2c1;
+extern UART_HandleTypeDef huart1;
 
 typedef enum
 {
@@ -87,7 +88,7 @@ uint16_t sd_parse_to_bytes_pac1(char *buffer, pack1_t *pack1) {
     memset(buffer, 0, 300);
     uint16_t num_written = snprintf(
             buffer, 300,
-			"%d;%d;%d;%ld;%d;%d;%d;%ld;%d;%f;%f;%f;%d;%d;%d\n",
+			"%d;%d;%d;%d;%d;%ld;%d;%d;%d;%d;%d;%d;%d;%ld;%d;%f;%f;%f;%d;%d;%d\n",
 			pack1->flag,pack1->num,pack1->accl[0],pack1->accl[1],pack1->accl[2],pack1->time_ms,
 			pack1->gyro[0],pack1->gyro[1],pack1->gyro[2],pack1->mag[0],
 			pack1->mag[1],pack1->mag[2],pack1->bme_temp,pack1->bme_press,pack1->bme_humidity,pack1->bme_height,
@@ -246,8 +247,25 @@ int app_main(){
 	int a;
 	uint Bytes;
 	uint16_t num_written;
+	char message[] = ".|.";
+	//uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
+	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
+	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, SET);
+	//HAL_UART_Transmit(&huart1, settings, sizeof(settings), HAL_MAX_DELAY);
+	//HAL_UART_Receive(&huart1, settings, 3, HAL_MAX_DELAY);
+
+	//uint8_t settings1[] = {0xC1, 0x00, 0x08};
+	//uint8_t result[11] = {0};
+	//HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
+	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
 
 	while(1){
+
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
+
+
+		HAL_UART_Transmit(&huart1, (uint8_t*)message, sizeof(message), HAL_MAX_DELAY);
 
 		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
@@ -360,6 +378,7 @@ int app_main(){
 
 
 	}
+
 			//nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
 			//nrf24_irq_get(&nrf24,&a);
 			//nrf24_fifo_flush_tx(&nrf24);
