@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.4.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -176,7 +176,7 @@
 <hole x="-10.7" y="-15.7" drill="3"/>
 </package>
 <package name="LOGO">
-<text x="0.5" y="0.5" size="1.5" layer="21" font="vector" ratio="15">КНПН 2024</text>
+<text x="0.5" y="0.5" size="1.5" layer="21" font="vector" ratio="15">КНПН 2025</text>
 <wire x1="0" y1="0" x2="12.3" y2="0" width="0.1" layer="21"/>
 <text x="0.5" y="-1.5" size="1" layer="21" font="vector" ratio="15">&gt;VALUE</text>
 </package>
@@ -470,7 +470,7 @@ distributor Buerklin, 11G810</description>
 <text x="-7.62" y="10.922" size="1.778" layer="95">&gt;NAME</text>
 </symbol>
 <symbol name="LOGO">
-<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2025 - </text>
+<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2024 - </text>
 <text x="104.14" y="0" size="12.7" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="MP2225">
@@ -11560,7 +11560,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="U$10" library="UNKNOWN-2024" deviceset="LIS3MDL" device=""/>
 <part name="S1" library="UNKNOWN-2024" deviceset="UNICS-SWITCH" device="SS_12D11"/>
 <part name="X2" library="UNKNOWN-2024" deviceset="JST-3-2.5" device="" value="AKKUM"/>
-<part name="SI2302CDS" library="CanCubeSat" deviceset="SI2302CDS" device=""/>
+<part name="SI2302" library="CanCubeSat" deviceset="SI2302CDS" device=""/>
 <part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="100R"/>
 <part name="COMPRESS" library="UNKNOWN-2024" deviceset="MOLEX-2-1.25" device=""/>
@@ -11716,7 +11716,7 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="VALUE" x="-16.51" y="119.38" size="1.778" layer="96"/>
 <attribute name="NAME" x="-16.51" y="132.842" size="1.778" layer="95"/>
 </instance>
-<instance part="SI2302CDS" gate="G$1" x="276.86" y="134.62" smashed="yes" rot="R180"/>
+<instance part="SI2302" gate="G$1" x="276.86" y="134.62" smashed="yes" rot="R180"/>
 <instance part="R1" gate="G$1" x="287.02" y="129.54" smashed="yes" rot="R90">
 <attribute name="NAME" x="285.5214" y="125.73" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="290.322" y="125.73" size="1.778" layer="96" rot="R90"/>
@@ -11891,7 +11891,7 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="X2" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<pinref part="SI2302CDS" gate="G$1" pin="S"/>
+<pinref part="SI2302" gate="G$1" pin="S"/>
 <wire x1="287.02" y1="134.62" x2="297.18" y2="134.62" width="0.1524" layer="91"/>
 <label x="292.1" y="134.62" size="1.778" layer="95"/>
 <pinref part="R1" gate="G$1" pin="2"/>
@@ -12434,7 +12434,7 @@ Source: AVX .. aphvc.pdf</description>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="SI2302CDS" gate="G$1" pin="G"/>
+<pinref part="SI2302" gate="G$1" pin="G"/>
 <wire x1="276.86" y1="127" x2="276.86" y2="124.46" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="2"/>
 <pinref part="R1" gate="G$1" pin="1"/>
@@ -12469,7 +12469,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="259.08" y1="116.84" x2="259.08" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="259.08" y1="134.62" x2="241.3" y2="134.62" width="0.1524" layer="91"/>
 <junction x="259.08" y="116.84"/>
-<pinref part="SI2302CDS" gate="G$1" pin="D"/>
+<pinref part="SI2302" gate="G$1" pin="D"/>
 <wire x1="259.08" y1="134.62" x2="266.7" y2="134.62" width="0.1524" layer="91"/>
 <junction x="259.08" y="134.62"/>
 </segment>

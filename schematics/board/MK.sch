@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.4.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -621,7 +621,7 @@
 <text x="-3.81" y="7.62" size="1.27" layer="25">&gt;NAME</text>
 </package>
 <package name="LOGO">
-<text x="0.5" y="0.5" size="1.5" layer="21" font="vector" ratio="15">КНПН 2024</text>
+<text x="0.5" y="0.5" size="1.5" layer="21" font="vector" ratio="15">КНПН 2025</text>
 <wire x1="0" y1="0" x2="12.3" y2="0" width="0.1" layer="21"/>
 <text x="0.5" y="-1.5" size="1" layer="21" font="vector" ratio="15">&gt;VALUE</text>
 </package>
@@ -796,7 +796,7 @@
 <text x="-7.62" y="27.94" size="1.778" layer="95">&gt;NAME</text>
 </symbol>
 <symbol name="LOGO">
-<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2025 - </text>
+<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2024 - </text>
 <text x="104.14" y="0" size="12.7" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="2N-MOSFET">
@@ -12025,7 +12025,7 @@ Source: www.kingbright.com</description>
 <parts>
 <part name="MICRO_SD" library="UNKNOWN-2024" deviceset="SD" device=""/>
 <part name="BUZZER" library="CanCubeSat" deviceset="BUZZER" device="S8R6"/>
-<part name="SI2302CDS" library="CanCubeSat" deviceset="SI2302CDS" device=""/>
+<part name="SI2302" library="CanCubeSat" deviceset="SI2302CDS" device=""/>
 <part name="R9" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="100R"/>
 <part name="U$2" library="UNKNOWN-2024" deviceset="SWITCH_MSS" device=""/>
@@ -12049,10 +12049,10 @@ Source: www.kingbright.com</description>
 <part name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="100nF"/>
 <part name="R20" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R2512" package3d_urn="urn:adsk.eagle:package:23545/2" value="R05"/>
 <part name="U$17" library="UNKNOWN-2024" deviceset="IRF7905PBF" device=""/>
-<part name="PERE1" library="UNKNOWN-2024" deviceset="JST-2-2.5" device=""/>
+<part name="PERE_L" library="UNKNOWN-2024" deviceset="JST-2-2.5" device=""/>
 <part name="R22" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
 <part name="R23" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
-<part name="PERE2" library="UNKNOWN-2024" deviceset="JST-2-2.5" device=""/>
+<part name="PERE_SP" library="UNKNOWN-2024" deviceset="JST-2-2.5" device=""/>
 <part name="R24" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
 <part name="R25" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
 <part name="MOTOR_SP_V" library="UNKNOWN-2024" deviceset="MOLEX-2-1.25" device=""/>
@@ -12096,7 +12096,7 @@ Source: www.kingbright.com</description>
 <instance part="BUZZER" gate="G$1" x="76.2" y="-53.34" smashed="yes">
 <attribute name="NAME" x="68.58" y="-48.26" size="2.54" layer="95"/>
 </instance>
-<instance part="SI2302CDS" gate="G$1" x="109.22" y="-53.34" smashed="yes" rot="R180"/>
+<instance part="SI2302" gate="G$1" x="109.22" y="-53.34" smashed="yes" rot="R180"/>
 <instance part="R9" gate="G$1" x="119.38" y="-58.42" smashed="yes" rot="R90">
 <attribute name="NAME" x="117.8814" y="-62.23" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="122.682" y="-62.23" size="1.778" layer="96" rot="R90"/>
@@ -12183,7 +12183,7 @@ Source: www.kingbright.com</description>
 <attribute name="VALUE" x="104.14" y="1.27" size="1.778" layer="96" rot="R270"/>
 <attribute name="NAME" x="106.68" y="1.27" size="1.778" layer="95" rot="R270"/>
 </instance>
-<instance part="PERE1" gate="G$1" x="62.23" y="-21.59" smashed="yes">
+<instance part="PERE_L" gate="G$1" x="62.23" y="-21.59" smashed="yes">
 <attribute name="VALUE" x="60.96" y="-29.21" size="1.778" layer="96"/>
 <attribute name="NAME" x="60.96" y="-18.288" size="1.778" layer="95"/>
 </instance>
@@ -12195,7 +12195,7 @@ Source: www.kingbright.com</description>
 <attribute name="NAME" x="84.8614" y="6.35" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="89.662" y="6.35" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="PERE2" gate="G$1" x="104.14" y="-21.59" smashed="yes">
+<instance part="PERE_SP" gate="G$1" x="104.14" y="-21.59" smashed="yes">
 <attribute name="VALUE" x="102.87" y="-29.21" size="1.778" layer="96"/>
 <attribute name="NAME" x="102.87" y="-18.288" size="1.778" layer="95"/>
 </instance>
@@ -12310,7 +12310,7 @@ Source: www.kingbright.com</description>
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="SI2302CDS" gate="G$1" pin="S"/>
+<pinref part="SI2302" gate="G$1" pin="S"/>
 <wire x1="119.38" y1="-53.34" x2="129.54" y2="-53.34" width="0.1524" layer="91"/>
 <label x="124.46" y="-53.34" size="1.778" layer="95"/>
 <pinref part="R9" gate="G$1" pin="2"/>
@@ -12435,14 +12435,14 @@ Source: www.kingbright.com</description>
 </net>
 <net name="N$13" class="0">
 <segment>
-<pinref part="SI2302CDS" gate="G$1" pin="D"/>
+<pinref part="SI2302" gate="G$1" pin="D"/>
 <wire x1="99.06" y1="-53.34" x2="88.9" y2="-53.34" width="0.1524" layer="91"/>
 <pinref part="BUZZER" gate="G$1" pin="GND"/>
 </segment>
 </net>
 <net name="N$14" class="0">
 <segment>
-<pinref part="SI2302CDS" gate="G$1" pin="G"/>
+<pinref part="SI2302" gate="G$1" pin="G"/>
 <wire x1="109.22" y1="-60.96" x2="109.22" y2="-63.5" width="0.1524" layer="91"/>
 <pinref part="R10" gate="G$1" pin="2"/>
 <pinref part="R9" gate="G$1" pin="1"/>
@@ -12875,7 +12875,7 @@ Source: www.kingbright.com</description>
 <pinref part="U$17" gate="G$1" pin="D2"/>
 <wire x1="93.98" y1="-12.7" x2="93.98" y2="-21.59" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="-21.59" x2="69.85" y2="-21.59" width="0.1524" layer="91"/>
-<pinref part="PERE1" gate="G$1" pin="2"/>
+<pinref part="PERE_L" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="N$22" class="0">
@@ -12892,7 +12892,7 @@ Source: www.kingbright.com</description>
 <net name="N$21" class="0">
 <segment>
 <pinref part="U$17" gate="G$1" pin="D1"/>
-<pinref part="PERE2" gate="G$1" pin="2"/>
+<pinref part="PERE_SP" gate="G$1" pin="2"/>
 <wire x1="111.76" y1="-12.7" x2="111.76" y2="-21.59" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -13295,12 +13295,12 @@ Source: www.kingbright.com</description>
 </net>
 <net name="4V" class="0">
 <segment>
-<pinref part="PERE2" gate="G$1" pin="1"/>
+<pinref part="PERE_SP" gate="G$1" pin="1"/>
 <wire x1="111.76" y1="-24.13" x2="121.92" y2="-24.13" width="0.1524" layer="91"/>
 <label x="118.11" y="-24.13" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="PERE1" gate="G$1" pin="1"/>
+<pinref part="PERE_L" gate="G$1" pin="1"/>
 <wire x1="69.85" y1="-24.13" x2="80.01" y2="-24.13" width="0.1524" layer="91"/>
 <label x="76.2" y="-24.13" size="1.778" layer="95"/>
 </segment>
