@@ -65,9 +65,9 @@ FATFS fileSystem; // переменная типа FATFS
 FIL File_1csv; // хендлер файла
 FIL File_2csv; // хендлер файла
 FIL File_b; // хендлер файла
-const char path1[] = "packet1.csv";
-const char path2[] = "packet2.csv";
-const char pathb[] = "packetb.bin";
+const char path1[] = "packet1.csv\0";
+const char path2[] = "packet2.csv\0";
+const char pathb[] = "packetb.bin\0";
 
 FRESULT is_mount = 0;
 int needs_mount = 0;
@@ -105,17 +105,21 @@ uint16_t sd_parse_to_bytes_pac2(char *buffer, pack2_t *pack2) {
 int app_main(){
 
 //файлы
+	UINT Bytes = 0;
 
 	memset(&fileSystem, 0x00, sizeof(fileSystem));
 
 	extern Disk_drvTypeDef disk;
 	disk.is_initialized[0] = 0;
-	is_mount = f_mount(&fileSystem, "0:", 1);
+	is_mount = f_mount(&fileSystem, "", 1);
 
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_CREATE_ALWAYS); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res1csv != FR_OK;
-		int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+		char test[200] = "num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n";
+		volatile FRESULT res1csv3 = f_write(&File_1csv, test, 200, &Bytes);
+
+		//int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
 		res1csv = f_sync(&File_1csv);
 		needs_mount = needs_mount || res1csv != FR_OK;
 	}
@@ -130,6 +134,11 @@ int app_main(){
 		resb = f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND);
 		needs_mount = needs_mount || resb != FR_OK;
 	}
+/*
+	f_close(&File_b);
+	f_close(&File_1csv);
+	f_close(&File_2csv);
+*/
 
 
 
@@ -239,7 +248,7 @@ int app_main(){
 	pack2_t pack2 = {0};
 
 	int a;
-	uint Bytes;
+	//uint Bytes;
 	uint16_t num_written;
 	char message[] = ".|.";
 	//uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
@@ -254,12 +263,6 @@ int app_main(){
 	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
 
 	while(1){
-
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
-
-
-		HAL_UART_Transmit(&huart1, (uint8_t*)message, sizeof(message), HAL_MAX_DELAY);
 
 		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
@@ -282,7 +285,9 @@ int app_main(){
 			pack1.mag[i] = magg[i];
 		}
 
-
+			pack1.num = num1;
+			pack1.time_ms = HAL_GetTick();
+			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 			pack1.flag = 0xAA;
 			pack1.bme_height = height;
 			pack1.bme_humidity = bmp_humidity;
@@ -294,6 +299,10 @@ int app_main(){
 			pack1.state = 666;
 
 			num2 += 1;
+
+			pack2.num = num2;
+			pack2.time_ms = HAL_GetTick();
+			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 			pack2.flag = 0xBB;
 			pack2.num = num2;
 			pack2.time_ms = HAL_GetTick();
@@ -315,6 +324,12 @@ int app_main(){
 			pack2.bus_voltage = 666;
 			pack2.current = 666;
 
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
+
+			HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
+			HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
+
 			sd_state_t sd_state = SD_PACK_1;
 
 			num1 += 1;
@@ -322,9 +337,7 @@ int app_main(){
 
 			switch(sd_state) {
 				case SD_PACK_1:
-					pack1.num = num1;
-					pack1.time_ms = HAL_GetTick();
-					pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+
 
 					if (res1csv == FR_OK){
 						num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
@@ -341,9 +354,7 @@ int app_main(){
 				break;
 
 				case SD_PACK_2:
-					pack2.num = num2;
-					pack2.time_ms = HAL_GetTick();
-					pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
+
 
 					if (res2csv == FR_OK){
 						num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
