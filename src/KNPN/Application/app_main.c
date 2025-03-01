@@ -62,26 +62,20 @@ FRESULT mount_again(FIL *File1, FIL *File2, FIL *Fileb, FATFS *fileSystem, const
 }
 
 FATFS fileSystem; // переменная типа FATFS
-FIL File1; // хендлер файла
-FIL File2; // хендлер файла
-FIL Fileb; // хендлер файла
 FIL File_1csv; // хендлер файла
 FIL File_2csv; // хендлер файла
-FIL File_3csv; // хендлер файла
-const char pack1[] = "packet1.csv";
-const char pack2[] = "packet2.csv";
-const char pathb[] = "packetb.csv";
+FIL File_b; // хендлер файла
+const char path1[] = "packet1.csv";
+const char path2[] = "packet2.csv";
+const char pathb[] = "packetb.bin";
 
 FRESULT is_mount = 0;
 int needs_mount = 0;
 
-FRESULT res1 = 255;
-FRESULT res2 = 255;
-FRESULT resb = 255;
+
 FRESULT res1csv; // результат выполнения функции
 FRESULT res2csv; // результат выполнения функции
-FRESULT resvcsv; // результат выполнения функции
-FRESULT resm; // результат выполнения функции
+FRESULT resb; // результат выполнения функции
 char str_buf[300];
 
 uint16_t sd_parse_to_bytes_pac1(char *buffer, pack1_t *pack1) {
@@ -116,24 +110,24 @@ int app_main(){
 
 	extern Disk_drvTypeDef disk;
 	disk.is_initialized[0] = 0;
-	is_mount = f_mount(&fileSystem, "", 1);
+	is_mount = f_mount(&fileSystem, "0:", 1);
 
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res1 = f_open(&File1, (char*)pack1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
-		needs_mount = needs_mount || res1 != FR_OK;
-		f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar;\n", &File1);
-		res1 = f_sync(&File1);
-		needs_mount = needs_mount || res1 != FR_OK;
+		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		needs_mount = needs_mount || res1csv != FR_OK;
+		int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+		res1csv = f_sync(&File_1csv);
+		needs_mount = needs_mount || res1csv != FR_OK;
 	}
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res2 = f_open(&File2, (char*)pack2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
-		needs_mount = needs_mount || res2 != FR_OK;
-		f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File2);
-		res2 = f_sync(&File2);
-		needs_mount = needs_mount || res2 != FR_OK;
+		res2csv = f_open(&File_2csv, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
+		needs_mount = needs_mount || res2csv != FR_OK;
+		int res2csv2 = f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File_2csv);
+		res2csv = f_sync(&File_2csv);
+		needs_mount = needs_mount || res2csv != FR_OK;
 	}
 	if(is_mount == FR_OK){
-		resb = f_open(&Fileb, pathb, FA_WRITE | FA_OPEN_APPEND);
+		resb = f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND);
 		needs_mount = needs_mount || resb != FR_OK;
 	}
 
@@ -332,14 +326,15 @@ int app_main(){
 					pack1.time_ms = HAL_GetTick();
 					pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
-					if (is_mount == FR_OK){
-						res1 = f_write(&File1,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
-						res1 = f_sync(&File1); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-
+					if (res1csv == FR_OK){
 						num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
 
 						res1csv = f_write(&File_1csv,str_buf,num_written, &Bytes); // отправка на запись в файл
 						res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					}
+					if (resb == FR_OK){
+						resb = f_write(&File_b,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
+						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 					}
 					a++;
 					sd_state = SD_WAIT;
@@ -350,16 +345,16 @@ int app_main(){
 					pack2.time_ms = HAL_GetTick();
 					pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 
-					if (is_mount == FR_OK){
-						res2 = f_write(&File2,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
-						res2 = f_sync(&File2); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-
-
+					if (res2csv == FR_OK){
 						num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
 
 						res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
 						res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-					}
+						}
+						if (resb == FR_OK){
+							resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
+							resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+							}
 					a=0;
 				break;
 
