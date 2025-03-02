@@ -114,12 +114,10 @@ int app_main(){
 	is_mount = f_mount(&fileSystem, "", 1);
 
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
-		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_CREATE_ALWAYS); // открытие файла, обязательно для работы с ним
+		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res1csv != FR_OK;
-		char test[200] = "num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n";
-		volatile FRESULT res1csv3 = f_write(&File_1csv, test, 200, &Bytes);
 
-		//int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+		int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
 		res1csv = f_sync(&File_1csv);
 		needs_mount = needs_mount || res1csv != FR_OK;
 	}
@@ -143,7 +141,7 @@ int app_main(){
 
 
 
-
+	sd_state_t sd_state = SD_PACK_1;
 	double bmp_temp;
 	double bmp_press;
 	double bmp_humidity;
@@ -247,7 +245,7 @@ int app_main(){
 	pack1_t pack1 = {0};
 	pack2_t pack2 = {0};
 
-	int a;
+	int a = 0;
 	//uint Bytes;
 	uint16_t num_written;
 	char message[] = ".|.";
@@ -263,6 +261,20 @@ int app_main(){
 	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
 
 	while(1){
+
+		if(is_mount != FR_OK) {
+
+			f_mount(0, "0", 1);
+			extern Disk_drvTypeDef disk;
+			disk.is_initialized[0] = 0;
+			is_mount = f_mount(&fileSystem, "", 1);
+
+			f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла
+			f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+			f_open(&File_2csv, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла
+			f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File_2csv);
+			f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND); // открытие файла
+		}
 
 		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
@@ -285,6 +297,8 @@ int app_main(){
 			pack1.mag[i] = magg[i];
 		}
 
+			num1 += 1;
+
 			pack1.num = num1;
 			pack1.time_ms = HAL_GetTick();
 			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
@@ -296,7 +310,7 @@ int app_main(){
 			pack1.lidar = 666;
 			pack1.lux_board = 666;
 			pack1.lux_sp = 666;
-			pack1.state = 666;
+			pack1.state = 0;
 
 			num2 += 1;
 
@@ -328,12 +342,11 @@ int app_main(){
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
 
 			HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
+			HAL_Delay(100);
 			HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
+			HAL_Delay(100);
 
-			sd_state_t sd_state = SD_PACK_1;
 
-			num1 += 1;
-			num2 += 1;
 
 			switch(sd_state) {
 				case SD_PACK_1:
@@ -361,11 +374,13 @@ int app_main(){
 
 						res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
 						res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-						}
-						if (resb == FR_OK){
-							resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
-							resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-							}
+					}
+					if (resb == FR_OK){
+						resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
+						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					}
+
+					sd_state = SD_WAIT;
 					a=0;
 				break;
 
