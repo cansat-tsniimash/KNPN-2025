@@ -11,8 +11,8 @@
 typedef struct{
 	uint8_t flag;
 	uint16_t num;
-	int16_t accl[3]; //6
 	uint32_t time_ms;
+	int16_t accl[3]; //6
 	int16_t gyro[3]; // 6
 	int16_t mag[3];// 6
 	int16_t bme_temp; // 2
