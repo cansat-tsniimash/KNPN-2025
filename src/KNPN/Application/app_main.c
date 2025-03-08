@@ -187,56 +187,56 @@ int app_main(){
 	bme_important_shit_t bme_shit;
 	its_bme280_init(UNKNOWN_BME);
 
-	//настройка радио
-	nrf24_spi_pins_t nrf_pins;
-	nrf_pins.ce_port = GPIOC;
-	nrf_pins.cs_port = GPIOC;
-	nrf_pins.ce_pin = GPIO_PIN_13;
-	nrf_pins.cs_pin = GPIO_PIN_14;
-	nrf24_lower_api_config_t nrf24;
-	nrf24_spi_init(&nrf24, &hspi4, &nrf_pins);
-
-	//printf("before setup\n");
-	//nrf_dump_regs(&nrf24);
-
-	nrf24_mode_power_down(&nrf24);
-	nrf24_rf_config_t nrf_config;
-	nrf_config.data_rate = NRF24_DATARATE_250_KBIT;
-	nrf_config.tx_power = NRF24_TXPOWER_MINUS_0_DBM;
-	nrf_config.rf_channel = 10;		//101;
-	nrf24_setup_rf(&nrf24, &nrf_config);
-	nrf24_protocol_config_t nrf_protocol_config;
-	nrf_protocol_config.crc_size = NRF24_CRCSIZE_1BYTE;
-	nrf_protocol_config.address_width = NRF24_ADDRES_WIDTH_5_BYTES;
-	nrf_protocol_config.en_dyn_payload_size = true;
-	nrf_protocol_config.en_ack_payload = false;
-	nrf_protocol_config.en_dyn_ack = false;
-	nrf_protocol_config.auto_retransmit_count = 0;
-	nrf_protocol_config.auto_retransmit_delay = 0;
-	nrf24_setup_protocol(&nrf24, &nrf_protocol_config);
-	nrf24_pipe_set_tx_addr(&nrf24, 0xacacacacac);
-
-	nrf24_pipe_config_t pipe_config;
-	for (int i = 1; i < 6; i++)
-	{
-		pipe_config.address = 0xacacacacac;
-		pipe_config.address = (pipe_config.address & ~((uint64_t)0xff << 32)) | ((uint64_t)(i + 7) << 32);
-		pipe_config.enable_auto_ack = false;
-		pipe_config.payload_size = -1;
-		nrf24_pipe_rx_start(&nrf24, i, &pipe_config);
-	}
-
-	pipe_config.address = 0xafafafaf01;
-	pipe_config.enable_auto_ack = false;
-	pipe_config.payload_size = -1;
-	nrf24_pipe_rx_start(&nrf24, 0, &pipe_config);
-
-	nrf24_mode_standby(&nrf24);
-	printf("\n\n");
-	printf("after setup\n");
-	//nrf_dump_regs(&nrf24);
-	printf("\n\n");
-	nrf24_mode_tx(&nrf24);
+//	//настройка радио
+//	nrf24_spi_pins_t nrf_pins;
+//	nrf_pins.ce_port = GPIOC;
+//	nrf_pins.cs_port = GPIOC;
+//	nrf_pins.ce_pin = GPIO_PIN_13;
+//	nrf_pins.cs_pin = GPIO_PIN_14;
+//	nrf24_lower_api_config_t nrf24;
+//	nrf24_spi_init(&nrf24, &hspi4, &nrf_pins);
+//
+//	//printf("before setup\n");
+//	//nrf_dump_regs(&nrf24);
+//
+//	nrf24_mode_power_down(&nrf24);
+//	nrf24_rf_config_t nrf_config;
+//	nrf_config.data_rate = NRF24_DATARATE_250_KBIT;
+//	nrf_config.tx_power = NRF24_TXPOWER_MINUS_0_DBM;
+//	nrf_config.rf_channel = 10;		//101;
+//	nrf24_setup_rf(&nrf24, &nrf_config);
+//	nrf24_protocol_config_t nrf_protocol_config;
+//	nrf_protocol_config.crc_size = NRF24_CRCSIZE_1BYTE;
+//	nrf_protocol_config.address_width = NRF24_ADDRES_WIDTH_5_BYTES;
+//	nrf_protocol_config.en_dyn_payload_size = true;
+//	nrf_protocol_config.en_ack_payload = false;
+//	nrf_protocol_config.en_dyn_ack = false;
+//	nrf_protocol_config.auto_retransmit_count = 0;
+//	nrf_protocol_config.auto_retransmit_delay = 0;
+//	nrf24_setup_protocol(&nrf24, &nrf_protocol_config);
+//	nrf24_pipe_set_tx_addr(&nrf24, 0xacacacacac);
+//
+//	nrf24_pipe_config_t pipe_config;
+//	for (int i = 1; i < 6; i++)
+//	{
+//		pipe_config.address = 0xacacacacac;
+//		pipe_config.address = (pipe_config.address & ~((uint64_t)0xff << 32)) | ((uint64_t)(i + 7) << 32);
+//		pipe_config.enable_auto_ack = false;
+//		pipe_config.payload_size = -1;
+//		nrf24_pipe_rx_start(&nrf24, i, &pipe_config);
+//	}
+//
+//	pipe_config.address = 0xafafafaf01;
+//	pipe_config.enable_auto_ack = false;
+//	pipe_config.payload_size = -1;
+//	nrf24_pipe_rx_start(&nrf24, 0, &pipe_config);
+//
+//	nrf24_mode_standby(&nrf24);
+//	printf("\n\n");
+//	printf("after setup\n");
+//	//nrf_dump_regs(&nrf24);
+//	printf("\n\n");
+//	nrf24_mode_tx(&nrf24);
 
 	int16_t magg[3];
 	int16_t gyro[3];
@@ -301,7 +301,6 @@ int app_main(){
 
 			pack1.num = num1;
 			pack1.time_ms = HAL_GetTick();
-			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 			pack1.flag = 0xAA;
 			pack1.bme_height = height;
 			pack1.bme_humidity = bmp_humidity;
@@ -311,16 +310,15 @@ int app_main(){
 			pack1.lux_board = 666;
 			pack1.lux_sp = 666;
 			pack1.state = 0;
+			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
 			num2 += 1;
 
 			pack2.num = num2;
 			pack2.time_ms = HAL_GetTick();
-			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 			pack2.flag = 0xBB;
 			pack2.num = num2;
 			pack2.time_ms = HAL_GetTick();
-			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 			pack2.MICS_CO = 666;
 			pack2.MICS_NH3 = 666;
 			pack2.MICS_NO2 = 666;
@@ -337,9 +335,13 @@ int app_main(){
 			pack2.bme_temp_g = 666;
 			pack2.bus_voltage = 666;
 			pack2.current = 666;
+			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
 			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
+
+			int size_pack1 = sizeof(pack1);
+			int size_pack2 = sizeof(pack2);
 
 			HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
 			HAL_Delay(100);
