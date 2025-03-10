@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.4.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -526,7 +526,7 @@
 <text x="-4.064" y="6.096" size="1.27" layer="95">&gt;NAME</text>
 </symbol>
 <symbol name="LOGO">
-<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2024 - </text>
+<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2025 - </text>
 <text x="104.14" y="0" size="12.7" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="MICS-5524">
@@ -8583,10 +8583,10 @@ Source: AVX .. aphvc.pdf</description>
 <parts>
 <part name="BME280" library="UNKNOWN-2024" deviceset="BME280" device="BME280-PINS-ONLY"/>
 <part name="MICS-6814" library="CanCubeSat" deviceset="MICS-6814" device=""/>
-<part name="U$2" library="UNKNOWN-2024" deviceset="LOGO" device="PCB-&quot;&quot;" value="Плата ГЕРМО"/>
+<part name="U$2" library="UNKNOWN-2024" deviceset="LOGO" device="PCB-&quot;&quot;" value="Плата Гермообъема"/>
 <part name="MICS-5524" library="UNKNOWN-2024" deviceset="MICS_5524" device=""/>
 <part name="R17" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
-<part name="U$4" library="UNKNOWN-2024" deviceset="CCS811" device=""/>
+<part name="CCS811" library="UNKNOWN-2024" deviceset="CCS811" device=""/>
 <part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="5k1"/>
 <part name="R8" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
@@ -8632,8 +8632,8 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="MICS-6814" gate="G$1" x="-58.42" y="50.8" smashed="yes">
 <attribute name="NAME" x="-64.262" y="59.436" size="1.27" layer="95"/>
 </instance>
-<instance part="U$2" gate="G$1" x="-104.14" y="78.74" smashed="yes">
-<attribute name="VALUE" x="0" y="78.74" size="12.7" layer="96"/>
+<instance part="U$2" gate="G$1" x="-124.46" y="78.74" smashed="yes">
+<attribute name="VALUE" x="-20.32" y="78.74" size="12.7" layer="96"/>
 </instance>
 <instance part="MICS-5524" gate="G$1" x="30.48" y="50.8" smashed="yes">
 <attribute name="NAME" x="24.638" y="56.896" size="1.27" layer="95"/>
@@ -8642,7 +8642,7 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="-8.89" y="54.8386" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-8.89" y="50.038" size="1.778" layer="96"/>
 </instance>
-<instance part="U$4" gate="G$1" x="109.22" y="48.26" smashed="yes"/>
+<instance part="CCS811" gate="G$1" x="109.22" y="48.26" smashed="yes"/>
 <instance part="R1" gate="G$1" x="76.2" y="48.26" smashed="yes" rot="R180">
 <attribute name="NAME" x="72.39" y="49.7586" size="1.778" layer="95"/>
 <attribute name="VALUE" x="72.39" y="44.958" size="1.778" layer="96"/>
@@ -8774,7 +8774,7 @@ Source: AVX .. aphvc.pdf</description>
 <label x="-20.32" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="GND"/>
+<pinref part="CCS811" gate="G$1" pin="GND"/>
 <wire x1="96.52" y1="55.88" x2="83.82" y2="55.88" width="0.1524" layer="91"/>
 <label x="83.82" y="55.88" size="1.778" layer="95"/>
 </segment>
@@ -8827,7 +8827,7 @@ Source: AVX .. aphvc.pdf</description>
 <label x="50.8" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="VCC"/>
+<pinref part="CCS811" gate="G$1" pin="VCC"/>
 <wire x1="96.52" y1="58.42" x2="83.82" y2="58.42" width="0.1524" layer="91"/>
 <label x="83.82" y="58.42" size="1.778" layer="95"/>
 </segment>
@@ -8902,7 +8902,7 @@ Source: AVX .. aphvc.pdf</description>
 </segment>
 <segment>
 <wire x1="96.52" y1="50.8" x2="83.82" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="U$4" gate="G$1" pin="SDA"/>
+<pinref part="CCS811" gate="G$1" pin="SDA"/>
 <label x="83.82" y="50.8" size="1.778" layer="95"/>
 </segment>
 <segment>
@@ -8923,7 +8923,7 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="BME280" gate="G$1" pin="SCL"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="SCL"/>
+<pinref part="CCS811" gate="G$1" pin="SCL"/>
 <wire x1="96.52" y1="53.34" x2="83.82" y2="53.34" width="0.1524" layer="91"/>
 <label x="83.82" y="53.34" size="1.778" layer="95"/>
 </segment>
@@ -8966,7 +8966,7 @@ Source: AVX .. aphvc.pdf</description>
 <net name="WAC" class="0">
 <segment>
 <wire x1="96.52" y1="48.26" x2="81.28" y2="48.26" width="0.1524" layer="91"/>
-<pinref part="U$4" gate="G$1" pin="WAC"/>
+<pinref part="CCS811" gate="G$1" pin="WAC"/>
 <label x="83.82" y="48.26" size="1.778" layer="95"/>
 <pinref part="R1" gate="G$1" pin="1"/>
 </segment>

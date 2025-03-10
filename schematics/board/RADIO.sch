@@ -470,7 +470,7 @@ distributor Buerklin, 11G810</description>
 <text x="-7.62" y="10.922" size="1.778" layer="95">&gt;NAME</text>
 </symbol>
 <symbol name="LOGO">
-<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2024 - </text>
+<text x="0" y="0" size="12.7" layer="90" ratio="11">КНПН 2025 - </text>
 <text x="104.14" y="0" size="12.7" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="MP2225">
@@ -11588,7 +11588,7 @@ Source: AVX .. aphvc.pdf</description>
 </classes>
 <parts>
 <part name="GPS-NEO7M" library="UNKNOWN-2024" deviceset="GPS-NEO7M" device=""/>
-<part name="U$1" library="UNKNOWN-2024" deviceset="LOGO" device="PCB-&quot;&quot;" value="Плата радио"/>
+<part name="U$1" library="UNKNOWN-2024" deviceset="LOGO" device="PCB-&quot;&quot;" value="Плата Радио"/>
 <part name="MP1584-3V3" library="UNKNOWN-2024" deviceset="MP1584-B" device=""/>
 <part name="U$2" library="UNKNOWN-2024" deviceset="MP2225" device=""/>
 <part name="C3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-US" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="0,1u"/>
@@ -11622,7 +11622,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="RADIO" library="UNKNOWN-2024" deviceset="E220-400T22S" device=""/>
 <part name="LSM6DS3" library="UNKNOWN-2024" deviceset="LSM6DS3_WITHOUT" device="" value="LSM6DS3"/>
 <part name="U$10" library="UNKNOWN-2024" deviceset="LIS3MDL" device=""/>
-<part name="S1" library="UNKNOWN-2024" deviceset="UNICS-SWITCH" device="SS_12D11"/>
+<part name="POWER" library="UNKNOWN-2024" deviceset="UNICS-SWITCH" device="SS_12D11"/>
 <part name="X2" library="UNKNOWN-2024" deviceset="JST-3-2.5" device="" value="AKKUM"/>
 <part name="SI2302" library="CanCubeSat" deviceset="SI2302CDS" device=""/>
 <part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
@@ -11632,8 +11632,8 @@ Source: AVX .. aphvc.pdf</description>
 <part name="VALVE2" library="UNKNOWN-2024" deviceset="MOLEX-2-1.25" device=""/>
 <part name="JP4" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X14" device="" package3d_urn="urn:adsk.eagle:package:22417/2"/>
 <part name="JP5" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X12" device="" package3d_urn="urn:adsk.eagle:package:22487/2"/>
-<part name="U$7" library="UNKNOWN-2024" deviceset="MOLEX-4-1.25" device=""/>
-<part name="U$8" library="UNKNOWN-2024" deviceset="MOLEX-5-1.25" device=""/>
+<part name="LIDAR" library="UNKNOWN-2024" deviceset="MOLEX-4-1.25" device=""/>
+<part name="MOTOR_BOARD" library="UNKNOWN-2024" deviceset="MOLEX-5-1.25" device=""/>
 <part name="JP1" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
 <part name="JP3" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X4" device="" package3d_urn="urn:adsk.eagle:package:22407/2"/>
 </parts>
@@ -11772,7 +11772,7 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="43.18" y="63.5" size="1.27" layer="95"/>
 <attribute name="VALUE" x="45.72" y="17.78" size="1.27" layer="96"/>
 </instance>
-<instance part="S1" gate="1" x="-5.08" y="99.06" smashed="yes" rot="R90">
+<instance part="POWER" gate="1" x="-5.08" y="99.06" smashed="yes" rot="R90">
 <attribute name="NAME" x="-3.175" y="92.71" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="-8.255" y="95.25" size="1.778" layer="96" rot="R180"/>
 </instance>
@@ -11809,11 +11809,11 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="-41.91" y="137.795" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-41.91" y="101.6" size="1.778" layer="96"/>
 </instance>
-<instance part="U$7" gate="G$1" x="251.46" y="40.64" smashed="yes">
+<instance part="LIDAR" gate="G$1" x="251.46" y="40.64" smashed="yes">
 <attribute name="NAME" x="245.11" y="46.355" size="1.778" layer="95"/>
 <attribute name="VALUE" x="247.65" y="30.48" size="1.778" layer="96"/>
 </instance>
-<instance part="U$8" gate="G$1" x="251.46" y="63.5" smashed="yes">
+<instance part="MOTOR_BOARD" gate="G$1" x="251.46" y="63.5" smashed="yes">
 <attribute name="NAME" x="245.11" y="71.755" size="1.778" layer="95"/>
 </instance>
 <instance part="JP1" gate="G$1" x="-45.72" y="7.62" smashed="yes">
@@ -11969,7 +11969,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="35.56" x2="233.68" y2="35.56" width="0.1524" layer="91"/>
 <label x="233.68" y="35.56" size="1.778" layer="95"/>
-<pinref part="U$7" gate="G$1" pin="4"/>
+<pinref part="LIDAR" gate="G$1" pin="4"/>
 </segment>
 <segment>
 <wire x1="-48.26" y1="-5.08" x2="-68.58" y2="-5.08" width="0.1524" layer="91"/>
@@ -12032,7 +12032,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="58.42" x2="231.14" y2="58.42" width="0.1524" layer="91"/>
 <label x="231.14" y="58.42" size="1.778" layer="95"/>
-<pinref part="U$8" gate="G$1" pin="5"/>
+<pinref part="MOTOR_BOARD" gate="G$1" pin="5"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -12085,7 +12085,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="38.1" x2="233.68" y2="38.1" width="0.1524" layer="91"/>
 <label x="233.68" y="38.1" size="1.778" layer="95"/>
-<pinref part="U$7" gate="G$1" pin="3"/>
+<pinref part="LIDAR" gate="G$1" pin="3"/>
 </segment>
 <segment>
 <wire x1="-48.26" y1="-7.62" x2="-68.58" y2="-7.62" width="0.1524" layer="91"/>
@@ -12135,7 +12135,7 @@ Source: AVX .. aphvc.pdf</description>
 <junction x="114.3" y="119.38"/>
 </segment>
 <segment>
-<pinref part="S1" gate="1" pin="P"/>
+<pinref part="POWER" gate="1" pin="P"/>
 <wire x1="0" y1="101.6" x2="10.16" y2="101.6" width="0.1524" layer="91"/>
 <label x="5.08" y="101.6" size="1.778" layer="95"/>
 </segment>
@@ -12341,7 +12341,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="-10.16" y1="104.14" x2="-25.4" y2="104.14" width="0.1524" layer="91"/>
 <label x="-25.4" y="104.14" size="1.778" layer="95"/>
-<pinref part="S1" gate="1" pin="S"/>
+<pinref part="POWER" gate="1" pin="S"/>
 </segment>
 </net>
 <net name="RX_GPS" class="0">
@@ -12421,7 +12421,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="60.96" x2="231.14" y2="60.96" width="0.1524" layer="91"/>
 <label x="231.14" y="60.96" size="1.778" layer="95"/>
-<pinref part="U$8" gate="G$1" pin="4"/>
+<pinref part="MOTOR_BOARD" gate="G$1" pin="4"/>
 </segment>
 </net>
 <net name="4V" class="0">
@@ -12511,14 +12511,14 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="68.58" x2="231.14" y2="68.58" width="0.1524" layer="91"/>
 <label x="231.14" y="68.58" size="1.778" layer="95"/>
-<pinref part="U$8" gate="G$1" pin="1"/>
+<pinref part="MOTOR_BOARD" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="RX_LIDAR" class="0">
 <segment>
 <wire x1="248.92" y1="40.64" x2="233.68" y2="40.64" width="0.1524" layer="91"/>
 <label x="233.68" y="40.64" size="1.778" layer="95"/>
-<pinref part="U$7" gate="G$1" pin="2"/>
+<pinref part="LIDAR" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <wire x1="-71.12" y1="76.2" x2="-38.1" y2="76.2" width="0.1524" layer="91"/>
@@ -12530,7 +12530,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="43.18" x2="233.68" y2="43.18" width="0.1524" layer="91"/>
 <label x="233.68" y="43.18" size="1.778" layer="95"/>
-<pinref part="U$7" gate="G$1" pin="1"/>
+<pinref part="LIDAR" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <wire x1="-38.1" y1="78.74" x2="-71.12" y2="78.74" width="0.1524" layer="91"/>
@@ -12547,7 +12547,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="66.04" x2="231.14" y2="66.04" width="0.1524" layer="91"/>
 <label x="231.14" y="66.04" size="1.778" layer="95"/>
-<pinref part="U$8" gate="G$1" pin="2"/>
+<pinref part="MOTOR_BOARD" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="LATCH_SR" class="0">
@@ -12559,7 +12559,7 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <wire x1="248.92" y1="63.5" x2="231.14" y2="63.5" width="0.1524" layer="91"/>
 <label x="231.14" y="63.5" size="1.778" layer="95"/>
-<pinref part="U$8" gate="G$1" pin="3"/>
+<pinref part="MOTOR_BOARD" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="FOTO1" class="0">
