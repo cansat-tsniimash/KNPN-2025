@@ -8,6 +8,10 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
+#include <string.h>
+#include <stdio.h>
+#pragma pack(push,1)
+
 typedef struct{
 	uint8_t flag;
 	uint16_t num;
@@ -49,7 +53,7 @@ typedef struct{
 	uint16_t crc;
 }pack2_t;
 
-
+#pragma pack(pop)
 
 
 
