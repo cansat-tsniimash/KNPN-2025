@@ -1,0 +1,20 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2025-03-11T18:49:49Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.4.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.07,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "Cansat-2025-1"
+        },
+        "Owner": "  <>"
+    }
+}
