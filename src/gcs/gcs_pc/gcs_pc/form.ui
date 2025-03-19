@@ -35,32 +35,44 @@
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="1" colspan="2">
+   <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,2">
+    <property name="topMargin">
+     <number>9</number>
+    </property>
+    <property name="rightMargin">
+     <number>9</number>
+    </property>
+    <property name="bottomMargin">
+     <number>9</number>
+    </property>
+    <property name="spacing">
+     <number>6</number>
+    </property>
+    <item row="1" column="0" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="Connect">
         <property name="text">
          <string>Connect</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="Start">
         <property name="text">
          <string>Start</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="Stop">
         <property name="text">
          <string>Stop</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="Reset">
         <property name="text">
          <string>Reset</string>
         </property>
@@ -69,7 +81,41 @@
      </layout>
     </item>
     <item row="0" column="1">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="1">
+       <widget class="PlotWidget" name="SP_parameters" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="PlotWidget" name="Gases_consentration" native="true"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="PlotWidget" name="Magnetometer" native="true"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="PlotWidget" name="Accelerometer" native="true"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="PlotWidget" name="Giroscope" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="PlotWidget" name="Pressure" native="true"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="PlotWidget" name="Temperature" native="true"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="PlotWidget" name="Height" native="true"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="PlotWidget" name="Illumination" native="true"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
       <item>
        <widget class="QLabel" name="label_8">
         <property name="text">
@@ -81,10 +127,279 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget">
-        <property name="enabled">
+       <widget class="QTableWidget" name="tableWidget_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>240</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>245</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::SolidLine</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
+        <property name="cornerButtonEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="rowCount">
+         <number>18</number>
+        </property>
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>21</number>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>21</number>
+        </attribute>
+        <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="text">
+          <string>Numer</string>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="text">
+          <string>Time</string>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="text">
+          <string>Acceleration x</string>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="text">
+          <string>Acceleration y</string>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="text">
+          <string>Acceleration z</string>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="5" column="0">
+         <property name="text">
+          <string>Giroscope x</string>
+         </property>
+        </item>
+        <item row="5" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="6" column="0">
+         <property name="text">
+          <string>Giroscope y</string>
+         </property>
+        </item>
+        <item row="6" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="7" column="0">
+         <property name="text">
+          <string>Giroscope z</string>
+         </property>
+        </item>
+        <item row="7" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="8" column="0">
+         <property name="text">
+          <string>Magnetometer x</string>
+         </property>
+        </item>
+        <item row="8" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="9" column="0">
+         <property name="text">
+          <string>Magnetometer y</string>
+         </property>
+        </item>
+        <item row="9" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="10" column="0">
+         <property name="text">
+          <string>Magnetometer z</string>
+         </property>
+        </item>
+        <item row="10" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="11" column="0">
+         <property name="text">
+          <string>State</string>
+         </property>
+        </item>
+        <item row="11" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="12" column="0">
+         <property name="text">
+          <string>Illumination</string>
+         </property>
+        </item>
+        <item row="12" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="13" column="0">
+         <property name="text">
+          <string>Distance</string>
+         </property>
+        </item>
+        <item row="13" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="14" column="0">
+         <property name="text">
+          <string>Temperature</string>
+         </property>
+        </item>
+        <item row="14" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="15" column="0">
+         <property name="text">
+          <string>Height</string>
+         </property>
+        </item>
+        <item row="15" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="16" column="0">
+         <property name="text">
+          <string>Humidity</string>
+         </property>
+        </item>
+        <item row="16" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="17" column="0">
+         <property name="text">
+          <string>Pressure</string>
+         </property>
+        </item>
+        <item row="17" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -98,38 +413,219 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget_2"/>
-      </item>
-     </layout>
-    </item>
-    <item row="0" column="2">
-     <layout class="QGridLayout" name="gridLayout" rowminimumheight="100,100,100" columnminimumwidth="100,100,100">
-      <item row="1" column="1">
-       <widget class="PlotWidget" name="Height" native="true"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="PlotWidget" name="Magnetometer" native="true"/>
-      </item>
-      <item row="0" column="1">
-       <widget class="PlotWidget" name="Giroscope" native="true"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="PlotWidget" name="Accelerometer" native="true"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="PlotWidget" name="Pressure" native="true"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="PlotWidget" name="Temperature" native="true"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="PlotWidget" name="Gases_consentration" native="true"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="PlotWidget" name="SP_parameters" native="true"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="PlotWidget" name="Illumination" native="true"/>
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="maximumSize">
+         <size>
+          <width>245</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="rowCount">
+         <number>16</number>
+        </property>
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>23</number>
+        </attribute>
+        <attribute name="verticalHeaderHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <row/>
+        <column/>
+        <column/>
+        <item row="0" column="0">
+         <property name="text">
+          <string>Latitute</string>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="1" column="0">
+         <property name="text">
+          <string>Longitute</string>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="2" column="0">
+         <property name="text">
+          <string>Height GPS</string>
+         </property>
+        </item>
+        <item row="2" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="3" column="0">
+         <property name="text">
+          <string>Fix</string>
+         </property>
+        </item>
+        <item row="3" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="4" column="0">
+         <property name="text">
+          <string>Time GPS</string>
+         </property>
+        </item>
+        <item row="4" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="5" column="0">
+         <property name="text">
+          <string>MICS-6814 CO</string>
+         </property>
+        </item>
+        <item row="5" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="6" column="0">
+         <property name="text">
+          <string>MICS-6814 NO2</string>
+         </property>
+        </item>
+        <item row="6" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="7" column="0">
+         <property name="text">
+          <string>MICS-6814 NH3</string>
+         </property>
+        </item>
+        <item row="7" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="8" column="0">
+         <property name="text">
+          <string>MICS-5524</string>
+         </property>
+        </item>
+        <item row="8" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="9" column="0">
+         <property name="text">
+          <string>CCS811 CO2</string>
+         </property>
+        </item>
+        <item row="9" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="10" column="0">
+         <property name="text">
+          <string>CCS811 TVOC</string>
+         </property>
+        </item>
+        <item row="10" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="11" column="0">
+         <property name="text">
+          <string>Temperature germo</string>
+         </property>
+        </item>
+        <item row="11" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="12" column="0">
+         <property name="text">
+          <string>Pressure germo</string>
+         </property>
+        </item>
+        <item row="12" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="13" column="0">
+         <property name="text">
+          <string>Humidity germo</string>
+         </property>
+        </item>
+        <item row="13" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="14" column="0">
+         <property name="text">
+          <string>SP current</string>
+         </property>
+        </item>
+        <item row="14" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="15" column="0">
+         <property name="text">
+          <string>SP voltage</string>
+         </property>
+        </item>
+        <item row="15" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+       </widget>
       </item>
      </layout>
     </item>
