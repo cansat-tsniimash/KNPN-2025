@@ -25,7 +25,7 @@
 #include "DWT_Delay/dwt_delay.h"
 #include "structs.h"
 #include <fatfs.h>
-
+#include "AD5593/ad5593.h"
 
 extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
@@ -100,6 +100,101 @@ uint16_t sd_parse_to_bytes_pac2(char *buffer, pack2_t *pack2) {
 			pack2->CCS_TVOC,pack2->bme_temp_g,pack2->bme_press_g,pack2->bme_humidity_g,pack2->crc);
     return num_written;
 }
+
+static ad5593_t adc;
+
+static int setup_adc()
+{
+	ad5593_t * dev = &adc;
+	int rc = ad5593_ctor(dev, AD5593_ADDR_A0_HIGH, &hi2c1);
+	if (0 != rc)
+	{
+		perror("unable to ctor");
+		return EXIT_FAILURE;
+	}
+
+	HAL_Delay(1);
+
+	// Включаем питание на чем хотим
+	printf("power config\n");
+	rc = ad5593_power_config(dev, AD5593_POWER_DAC_REF, 0x00);
+	if (0 != rc)
+	{
+		perror("unable to power config");
+		return EXIT_FAILURE;
+	}
+
+	// Аналоговая конфигурация
+	printf("analog config\n");
+	ad5593_an_config_t an_config;
+	an_config.adc_buffer_enable = false;
+	an_config.adc_buffer_precharge = false;
+	an_config.adc_range = AD5593_RANGE_1REF;
+	rc = ad5593_an_config(dev, &an_config);
+	if (0 != rc)
+	{
+		perror("unable to an config");
+		return EXIT_FAILURE;
+	}
+
+	// Настройка пинов
+	printf("pin config\n");
+	rc = ad5593_pin_config(dev, 0xFF, AD5593_PINMODE_ADC);
+	if (0 != rc)
+	{
+		perror("unable to setup pins");
+		return EXIT_FAILURE;
+	}
+
+	return 0;
+}
+
+
+
+	float foto_sp;
+	float foto_state;
+	uint16_t R_MICS_5524;
+	uint16_t R_MICS_CO;
+	uint16_t R_MICS_NO2;
+	uint16_t R_MICS_NH3;
+
+
+static void test_adc()
+{
+	ad5593_t * dev = &adc;
+
+	ad5593_channel_id_t channels[] = {
+			AD5593_ADC_0, AD5593_ADC_1, AD5593_ADC_2, AD5593_ADC_3,
+			AD5593_ADC_4, AD5593_ADC_5,
+
+	};
+		ad5593_channel_id_t channel_0 = channels[0];
+		ad5593_channel_id_t channel_1 = channels[1];
+		ad5593_channel_id_t channel_2 = channels[2];
+		ad5593_channel_id_t channel_3 = channels[3];
+		ad5593_channel_id_t channel_4 = channels[4];
+		ad5593_channel_id_t channel_5 = channels[5];
+
+		ad5593_adc_read(dev, channel_0, &R_MICS_5524);
+		ad5593_adc_read(dev, channel_1, &R_MICS_CO);
+		ad5593_adc_read(dev, channel_2, &R_MICS_NO2);
+		ad5593_adc_read(dev, channel_3, &R_MICS_NH3);
+		ad5593_adc_read(dev, channel_4, (uint16_t*)&foto_sp);
+		ad5593_adc_read(dev, channel_5, (uint16_t*)&foto_state);
+
+		float volts_sp = foto_sp * 3.3 / 4095;  //Volts
+		float ohms_sp = volts_sp*(3300)/(3.3-volts_sp);    //Ohms
+		float lux_sp = exp((3.823-log(ohms_sp/1000))/0.816)*10.764;
+
+		float volts_state = foto_state * 3.3 / 4095;  //Volts
+		float ohms_state = volts_state*(3300)/(3.3-volts_state);    //Ohms
+		float lux_state = exp((3.823-log(ohms_state/1000))/0.816)*10.764;
+
+		foto_sp = lux_sp;
+		foto_state = lux_state;
+
+}
+
 
 
 int app_main(){
@@ -238,6 +333,9 @@ int app_main(){
 //	printf("\n\n");
 //	nrf24_mode_tx(&nrf24);
 
+	// Инициализация ad5593
+	setup_adc();
+
 	int16_t magg[3];
 	int16_t gyro[3];
 	int16_t acc_raw[3];
@@ -246,9 +344,12 @@ int app_main(){
 	pack2_t pack2 = {0};
 
 	int a = 0;
-	//uint Bytes;
+
 	uint16_t num_written;
-	char message[] = ".|.";
+
+/*
+	//uint Bytes;
+	//char message[] = ".|.";
 	//uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
 	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
 	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, SET);
@@ -259,6 +360,11 @@ int app_main(){
 	//uint8_t result[11] = {0};
 	//HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
 	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
+*/
+
+
+
+	//test_adc();
 
 	while(1){
 
@@ -268,6 +374,8 @@ int app_main(){
 			extern Disk_drvTypeDef disk;
 			disk.is_initialized[0] = 0;
 			is_mount = f_mount(&fileSystem, "", 1);
+
+			test_adc();
 
 			f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла
 			f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
@@ -307,8 +415,8 @@ int app_main(){
 			pack1.bme_press = bmp_press;
 			pack1.bme_temp = bmp_temp;
 			pack1.lidar = 666;
-			pack1.lux_board = 666;
-			pack1.lux_sp = 666;
+			pack1.lux_board = foto_state;
+			pack1.lux_sp = foto_sp;
 			pack1.state = 0;
 			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
@@ -317,12 +425,10 @@ int app_main(){
 			pack2.num = num2;
 			pack2.time_ms = HAL_GetTick();
 			pack2.flag = 0xBB;
-			pack2.num = num2;
-			pack2.time_ms = HAL_GetTick();
-			pack2.MICS_CO = 666;
-			pack2.MICS_NH3 = 666;
-			pack2.MICS_NO2 = 666;
-			pack2.MICS_5524 = 666;
+			pack2.MICS_CO = R_MICS_CO;
+			pack2.MICS_NH3 = R_MICS_NH3;
+			pack2.MICS_NO2 = R_MICS_NO2;
+			pack2.MICS_5524 = R_MICS_5524;
 			pack2.CCS_TVOC = 666;
 			pack2.CCS_CO2 = 666;
 			pack2.lat = 666;
