@@ -1,0 +1,81 @@
+﻿
+ФАЙЛ ЖУРНАЛА ЭКСПОРТА ИНТЕРФЕЙСА Creo Parametric 
+
+Вывод DFX для чертежа DRW0001.
+
+
+
+Процесс начат в: 23 Март 2025 г. 18:55:32
+
+Процесс завершен в: 23 Март 2025 г. 18:55:32
+
+Общее время процесса: 00:00:00.
+
+Выбранные опции конфигурации экспорта DXF/DWG:
+
+DXF_EXPORT_FORMAT                 2013
+DXF_OUT_DRAWING_SCALE             NO
+DXF_OUT_SCALE_VIEWS               YES
+DXF_OUT_SEP_DIM_W_BREAKS          NO
+INTF2D_OUT_STROKE_TEXT            NONE
+INTF2D_OUT_ENHANCED_ENTS          SPLINE_AND_HATCH
+INTF_OUT_LAYER                    NONE
+INTF2D_OUT_ACAD_MTEXT             YES
+INTF2D_OUT_ACAD_UNICODE           NO
+INTF2D_OUT_ACAD_TEXT_ALIGN        AS_IS
+INTF2D_OUT_PNT_ENT                NO
+INTF2D_OUT_OPEN_LOG_WINDOW        NO
+
+
+
+Наименование выходного файла mk-board.dxf
+Единицы измерения чертежа MM
+Ширина листа           558.800000
+Высота листа           431.800000
+
+
+
+
+ОБЪЕКТЫ:
+
+наименование         число
+____________                     _____
+
+ARC                              3
+BLOCK                            2
+CIRCLE                           4
+ENDBLK                           2
+LINE                             7
+
+ИТОГО     18
+
+
+
+
+СЛОИ:
+
+наименование         число
+____________                     _____
+
+0                                10
+1__AXES                          4
+1__CSYS                          0
+1__CURVES                        0
+1__DPLANES                       0
+1__DPOINTS                       0
+2__QUILT                         0
+3__DIM                           0
+ANNOTATION                       0
+DEFAULT_1                        0
+DEFAULT_2                        0
+DEFAULT_3                        0
+SURF_FINISH                      0
+TT                               0
+
+
+
+БЛОКИ:
+
+наименование         число
+____________                     _____
+

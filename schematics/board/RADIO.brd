@@ -2362,7 +2362,7 @@ design rules under a new name.</description>
 <signals>
 <signal name="GND">
 <contactref element="GPS-NEO7M" pad="P$4"/>
-<polygon width="0.3" layer="16">
+<polygon width="0.3" layer="16" rank="3">
 <vertex x="-2.8" y="82"/>
 <vertex x="86.2" y="82"/>
 <vertex x="86.2" y="0.9"/>
@@ -3343,25 +3343,27 @@ design rules under a new name.</description>
 <signal name="RX_LIDAR">
 <contactref element="LIDAR" pad="2"/>
 <contactref element="JP4" pad="8"/>
-<wire x1="70" y1="38.73" x2="71.57" y2="41.27" width="0.3" layer="1"/>
-<wire x1="72.7" y1="42.4" x2="72.7" y2="56.9" width="0.3" layer="1"/>
-<wire x1="71.57" y1="41.27" x2="72.7" y2="42.4" width="0.3" layer="1"/>
 <wire x1="64.557025" y1="59.831965625" x2="65.025059375" y2="60.3" width="0.3" layer="1"/>
 <wire x1="65.025059375" y1="60.3" x2="66.2" y2="60.3" width="0.3" layer="1"/>
 <wire x1="66.2" y1="60.3" x2="68.7" y2="57.8" width="0.3" layer="1"/>
 <wire x1="68.7" y1="57.8" x2="71.8" y2="57.8" width="0.3" layer="1"/>
-<wire x1="71.8" y1="57.8" x2="72.7" y2="56.9" width="0.3" layer="1"/>
+<wire x1="72.7" y1="56.9" x2="71.8" y2="57.8" width="0.3" layer="1"/>
+<wire x1="70" y1="38.73" x2="70.73" y2="38.73" width="0.3" layer="1"/>
+<wire x1="70.73" y1="38.73" x2="71.9" y2="39.9" width="0.3" layer="1"/>
+<wire x1="71.9" y1="39.9" x2="71.9" y2="41" width="0.3" layer="1"/>
+<wire x1="71.9" y1="41" x2="72.7" y2="41.8" width="0.3" layer="1"/>
+<wire x1="72.7" y1="41.8" x2="72.7" y2="56.9" width="0.3" layer="1"/>
 </signal>
 <signal name="TX_LIDAR">
 <contactref element="LIDAR" pad="1"/>
 <contactref element="JP4" pad="7"/>
-<wire x1="70" y1="41.27" x2="71.61" y2="43.81" width="0.3" layer="1"/>
-<wire x1="71.61" y1="43.81" x2="72.2" y2="44.4" width="0.3" layer="1"/>
-<wire x1="72.2" y1="44.4" x2="72.2" y2="54.30460625" width="0.3" layer="1"/>
 <wire x1="72.2" y1="54.30460625" x2="71.20460625" y2="55.3" width="0.3" layer="1"/>
 <wire x1="65.360509375" y1="58.139490625" x2="65.360509375" y2="58.874409375" width="0.3" layer="1"/>
 <wire x1="71.20460625" y1="55.3" x2="68.2" y2="55.3" width="0.3" layer="1"/>
 <wire x1="68.2" y1="55.3" x2="65.360509375" y2="58.139490625" width="0.3" layer="1"/>
+<wire x1="70" y1="41.27" x2="70.77" y2="41.27" width="0.3" layer="1"/>
+<wire x1="70.77" y1="41.27" x2="72.2" y2="42.7" width="0.3" layer="1"/>
+<wire x1="72.2" y1="42.7" x2="72.2" y2="54.30460625" width="0.3" layer="1"/>
 </signal>
 <signal name="OE_SR">
 <contactref element="JP4" pad="11"/>

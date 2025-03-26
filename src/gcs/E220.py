@@ -2,6 +2,9 @@ import RPi.GPIO as GPIO
 import serial
 import struct
 import time
+import datetime
+import argparse
+import sys
 GPIO.cleanup()
 # настроить пины
 radio_M0 = 6
@@ -56,6 +59,33 @@ def crc16(data : bytearray, offset=0, length=-1):
         crc = crc & 0xFFFF
     return crc & 0xFFFF
 
+#Настройка записи в сsv и bin
+def generate_logfile_name():
+    now = datetime.datetime.utcnow().replace(microsecond=0)
+    isostring = now.isoformat()  # string 2021-04-27T23:17:31
+    isostring = isostring.replace("-", "")  # string 20210427T23:17:31
+    isostring = isostring.replace(":", "")  # string 20210427T231731, òî ÷òî íàäî
+    return "./log/knpn_binary" + isostring + ".bin"
+
+def generate_csv_name(text):
+    now = datetime.datetime.utcnow().replace(microsecond=0)
+    isostring = now.isoformat()  # string 2021-04-27T23:17:31
+    isostring = isostring.replace("-", "")  # string 20210427T23:17:31
+    isostring = isostring.replace(":", "")  # string 20210427T231731, òî ÷òî íàäî
+    return text + isostring + ".csv"
+
+filename_f = generate_logfile_name()
+filename_f1 = generate_csv_name("./log/1_knpn")
+filename_f2 = generate_csv_name("./log/2_knpn")
+f = open(filename_f, 'wb')
+f.flush()
+f1 = open(filename_f1, 'w')
+f1.write('"Number";"Time_ms";"Accel x";"Accel y";"Accel z";"Gyro x";"Gyro y";"Gyro z";"Mag x";"Mag y";"Mag z";"Bme_temp";"Bme_press";"Bme_humidity";"Bme_height";"Lux_board";"Lux_sp";"State";"Lidar";"crc"\n')
+f1.flush()
+f2 = open(filename_f2, 'w')
+f2.write('"Number";"Time_ms";"Fix";"Lat";"Lon";"Alt";"GPS_time_s";"Current";"Bus_voltage";"MICS_5524";"MICS_CO";"MICS_NO2";"MICS_NH3";"CCS_CO2";"CCS_TVOC";"Bme_temp_g";"Bme_press_g";"Bme_humidity_g";"crc"\n')
+f2.flush()
+
 # настройка малинки
 operating_mode(3)
 addr_datarate = 0x02
@@ -82,40 +112,41 @@ flug_1 = 0xBB
 while True: 
     portion = ser.read(100)
     buf += portion
-    print (portion)
+   # print (portion)
 
     while len(buf) > 0:
 
         flug_cond = struct.unpack("B", buf[:1])
         if flug_cond[0] == flug_0:
-            print("buf: ", buf)
+        #    print("buf: ", buf)
             if len(buf) >= 50:
                 
                 crc_cond = crc16(buf[:48])
     
                 crc = struct.unpack("H", buf[48:50])
                 if crc_cond == crc[0]:
+                    print("==== Пакет тип 1 ====")
                     unpack_data = struct.unpack("<BHI10hIh3fBhH", buf[:50])
                     print ("Number", unpack_data[1])
                     print ("Time_ms", unpack_data[2])
-                    #print ("Accelerometer x", unpack_data[3]*488/1000/1000)
-                    #print ("Accelerometer y", unpack_data[4]*488/1000/1000)
-                    #print ("Accelerometer z", unpack_data[5]*488/1000/1000)
-                    #print ("Gyroscope x", unpack_data[6]*70/1000)
-                    #print ("Gyroscope y", unpack_data[7]*70/1000)
-                    #print ("Gyroscope z", unpack_data[8]*70/1000)
-                    #print ("Magnetometer x", unpack_data[9]/1711)
-                    #print ("Magnetometer y", unpack_data[10]/1711)
-                    #print ("Magnetometer z", unpack_data[11]/1711)
-                    print ("Accelerometer x", unpack_data[3])
-                    print ("Accelerometer y", unpack_data[4])
-                    print ("Accelerometer z", unpack_data[5])
-                    print ("Gyroscope x", unpack_data[6])
-                    print ("Gyroscope y", unpack_data[7])
-                    print ("Gyroscope z", unpack_data[8])
-                    print ("Magnetometer x", unpack_data[9])
-                    print ("Magnetometer y", unpack_data[10])
-                    print ("Magnetometer z", unpack_data[11])
+                    print ("Accelerometer x", unpack_data[3]*488/1000/1000)
+                    print ("Accelerometer y", unpack_data[4]*488/1000/1000)
+                    print ("Accelerometer z", unpack_data[5]*488/1000/1000)
+                    print ("Gyroscope x", unpack_data[6]*70/1000)
+                    print ("Gyroscope y", unpack_data[7]*70/1000)
+                    print ("Gyroscope z", unpack_data[8]*70/1000)
+                    print ("Magnetometer x", unpack_data[9]/1711)
+                    print ("Magnetometer y", unpack_data[10]/1711)
+                    print ("Magnetometer z", unpack_data[11]/1711)
+                #    print ("Accelerometer x", unpack_data[3])
+                #    print ("Accelerometer y", unpack_data[4])
+                #    print ("Accelerometer z", unpack_data[5])
+                #    print ("Gyroscope x", unpack_data[6])
+                #    print ("Gyroscope y", unpack_data[7])
+                #    print ("Gyroscope z", unpack_data[8])
+                #    print ("Magnetometer x", unpack_data[9])
+                #    print ("Magnetometer y", unpack_data[10])
+                #    print ("Magnetometer z", unpack_data[11])
                     print ("Bme_temp", unpack_data[12])
                     print ("Bme_press", unpack_data[13])
                     print ("Bme_humidity", unpack_data[14])
@@ -127,7 +158,16 @@ while True:
                     print ("crc", unpack_data[20])
                     print ("\n")
 
-                    print ("crc_ground", crc16(buf[:48]))
+                    f.write(buf[:50])
+                    f.flush()
+
+                    for i in range(1,21):
+                        f1.write(str(unpack_data[i]))
+                        f1.write(";")
+                    f1.write('\n')
+                    f1.flush()
+
+                   # print ("crc_ground", crc16(buf[:48]))
                     buf = buf[50:]
                 else:
                     buf = buf[1:]
@@ -143,6 +183,7 @@ while True:
                 crc = struct.unpack("H", buf[51:53])
 
                 if crc_cond == crc[0]:
+                    print("==== Пакет тип 2 ====")
                     unpack_data = struct.unpack("<BHIh3fIf7HhIhH", buf[:53])
                     print ("Number", unpack_data[1])
                     print ("Time_ms", unpack_data[2])
@@ -165,8 +206,17 @@ while True:
                     print ("crc", unpack_data[19])
                     print ('\n') 
 
+                    f.write(buf)
+                    f.flush()
 
-                    print ("crc_ground", crc16(buf[:51]))
+                    for i in range(1,20):
+                        f2.write(str(unpack_data[i]))
+                        f2.write(";")
+                    f2.write('\n')
+                    f2.flush()
+
+
+                  #  print ("crc_ground", crc16(buf[:51]))
                     buf = buf[53:]  
                 else:
                     buf = buf[1:]

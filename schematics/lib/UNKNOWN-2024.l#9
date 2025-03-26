@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="1.25" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="yes"/>
@@ -1691,6 +1691,66 @@ Source: http://www.jst.com .. eZH.pdf</description>
 <rectangle x1="-6.54" y1="-0.25" x2="-6.04" y2="0.25" layer="51"/>
 <pad name="6" x="-6.29" y="0" drill="1" diameter="1.5" shape="octagon"/>
 </package>
+<package name="JST-3-2.5">
+<description>
+
+&lt;b&gt;JST PH series header&lt;/b&gt; 2.00mm pitch disconnectable crimp style connectors, through-hole vertical (top entry type), 2 pins&lt;p&gt;
+
+</description>
+<pad name="1" x="2.52" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<pad name="2" x="0.02" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<text x="6.08" y="0" size="1.016" layer="25" rot="R270" align="bottom-center">&gt;NAME</text>
+<text x="1" y="2.54" size="1.016" layer="27" align="bottom-right">&gt;VALUE</text>
+<wire x1="-5.02" y1="1.6" x2="5.02" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="5.02" y1="1.6" x2="5.02" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="5.02" y1="-2.2" x2="-5.02" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="-5.02" y1="-2.2" x2="-5.02" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="-5.02" y1="1.6" x2="5.02" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="5.02" y1="1.6" x2="5.02" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="5.02" y1="-2.2" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="-2.2" x2="-5.02" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-5.02" y1="-2.2" x2="-5.02" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="1.1" x2="4.12" y2="1.1" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="1.1" x2="-4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-4.12" y1="-2.2" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="4.12" y1="1.1" x2="4.12" y2="-2.2" width="0.1524" layer="51"/>
+<rectangle x1="2.27" y1="-0.25" x2="2.77" y2="0.25" layer="51"/>
+<rectangle x1="-0.23" y1="-0.25" x2="0.27" y2="0.25" layer="51"/>
+<pad name="3" x="-2.56" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<rectangle x1="-2.81" y1="-0.25" x2="-2.31" y2="0.25" layer="51"/>
+</package>
+<package name="JST-5-2.5">
+<description>
+
+&lt;b&gt;JST PH series header&lt;/b&gt; 2.00mm pitch disconnectable crimp style connectors, through-hole vertical (top entry type), 2 pins&lt;p&gt;
+
+</description>
+<pad name="1" x="5.04" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<pad name="2" x="2.54" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<text x="8.6" y="0" size="1.016" layer="25" rot="R270" align="bottom-center">&gt;NAME</text>
+<text x="-0.25" y="2.54" size="1.016" layer="27" align="bottom-right">&gt;VALUE</text>
+<wire x1="-7.54" y1="1.6" x2="7.54" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="7.54" y1="1.6" x2="7.54" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="7.54" y1="-2.2" x2="-7.54" y2="-2.2" width="0.1524" layer="21"/>
+<wire x1="-7.54" y1="-2.2" x2="-7.54" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="-7.54" y1="1.6" x2="7.54" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="7.54" y1="1.6" x2="7.54" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="7.54" y1="-2.2" x2="6.64" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-6.64" y1="-2.2" x2="-7.54" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-7.54" y1="-2.2" x2="-7.54" y2="1.6" width="0.1524" layer="51"/>
+<wire x1="-6.64" y1="1.1" x2="6.64" y2="1.1" width="0.1524" layer="51"/>
+<wire x1="-6.64" y1="1.1" x2="-6.64" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="-6.64" y1="-2.2" x2="6.64" y2="-2.2" width="0.1524" layer="51"/>
+<wire x1="6.64" y1="1.1" x2="6.64" y2="-2.2" width="0.1524" layer="51"/>
+<rectangle x1="2.29" y1="-0.25" x2="2.79" y2="0.25" layer="51"/>
+<rectangle x1="-0.21" y1="-0.25" x2="0.29" y2="0.25" layer="51"/>
+<pad name="3" x="0.04" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<rectangle x1="4.79" y1="-0.25" x2="5.29" y2="0.25" layer="51"/>
+<rectangle x1="-2.71" y1="-0.25" x2="-2.21" y2="0.25" layer="51"/>
+<pad name="4" x="-2.46" y="0" drill="1" diameter="1.5" shape="octagon"/>
+<rectangle x1="-5.29" y1="-0.25" x2="-4.79" y2="0.25" layer="51"/>
+<pad name="5" x="-5.04" y="0" drill="1" diameter="1.5" shape="octagon"/>
+</package>
 </packages>
 <packages3d>
 <package3d name="255SB" urn="urn:adsk.eagle:package:27679/1" type="box">
@@ -2731,6 +2791,20 @@ distributor Buerklin, 11G810</description>
 <pin name="P$2" x="7.62" y="-2.54" length="middle" rot="R180"/>
 <wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.6096" layer="94"/>
 <wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.6096" layer="94"/>
+</symbol>
+<symbol name="M_1R03">
+<wire x1="3.81" y1="-5.08" x2="-1.27" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.6096" layer="94"/>
+<wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.6096" layer="94"/>
+<wire x1="-1.27" y1="5.08" x2="-1.27" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="3.81" y1="-5.08" x2="3.81" y2="5.08" width="0.4064" layer="94"/>
+<wire x1="-1.27" y1="5.08" x2="3.81" y2="5.08" width="0.4064" layer="94"/>
+<text x="-1.27" y="-7.62" size="1.778" layer="96">&gt;VALUE</text>
+<text x="-1.27" y="5.842" size="1.778" layer="95">&gt;NAME</text>
+<pin name="1" x="7.62" y="-2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
+<pin name="2" x="7.62" y="0" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
+<wire x1="1.27" y1="2.54" x2="2.54" y2="2.54" width="0.6096" layer="94"/>
+<pin name="3" x="7.62" y="2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3991,6 +4065,43 @@ Source: &lt;a href="https://www.hirose.com/product/document?clcode=CL0331-0472-2
 <connect gate="G$1" pin="SDA" pad="P$4"/>
 <connect gate="G$1" pin="VCC" pad="P$1"/>
 <connect gate="G$1" pin="WAC" pad="P$5"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="JST-6-2.5">
+<gates>
+<gate name="G$1" symbol="M_1R06" x="0" y="-2.54"/>
+</gates>
+<devices>
+<device name="" package="JST-6-2.5">
+<connects>
+<connect gate="G$1" pin="1" pad="4"/>
+<connect gate="G$1" pin="2" pad="3"/>
+<connect gate="G$1" pin="3" pad="2"/>
+<connect gate="G$1" pin="4" pad="1"/>
+<connect gate="G$1" pin="P$1" pad="5"/>
+<connect gate="G$1" pin="P$2" pad="6"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="JST-3-2.5">
+<gates>
+<gate name="G$1" symbol="M_1R03" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="JST-3-2.5">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
 </connects>
 <technologies>
 <technology name=""/>
