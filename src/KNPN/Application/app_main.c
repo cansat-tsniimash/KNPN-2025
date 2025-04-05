@@ -5,7 +5,7 @@
  *      Author: Install
  */
 
-
+#include <stdlib.h>
 #include "main.h"
 #include "Shift_Register/shift_reg.h"
 #include <LSM6DS3/DLSM.h>
@@ -28,9 +28,12 @@
 #include "AD5593/ad5593.h"
 
 extern SPI_HandleTypeDef hspi1;
-extern SPI_HandleTypeDef hspi4;
+//extern SPI_HandleTypeDef hspi4;
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart6;
+
 
 typedef enum
 {
@@ -246,6 +249,16 @@ int app_main(){
 	float mag[3] = {0};
 	float temperature_celsius_mag = 0.0;
 	float temperature_celsius_gyro = 0.0;
+	float lat;
+	float lon;
+	float alt;
+	float lats;
+	float lons;
+	float alts;
+	int64_t cookie;
+	int fix;
+	uint64_t gps_time_s;
+	uint32_t gps_time_us;
 	uint16_t num1 = 0 ;
 	uint16_t num2 = 0 ;
 //сдвиговый регистр
@@ -282,56 +295,7 @@ int app_main(){
 	bme_important_shit_t bme_shit;
 	its_bme280_init(UNKNOWN_BME);
 
-//	//настройка радио
-//	nrf24_spi_pins_t nrf_pins;
-//	nrf_pins.ce_port = GPIOC;
-//	nrf_pins.cs_port = GPIOC;
-//	nrf_pins.ce_pin = GPIO_PIN_13;
-//	nrf_pins.cs_pin = GPIO_PIN_14;
-//	nrf24_lower_api_config_t nrf24;
-//	nrf24_spi_init(&nrf24, &hspi4, &nrf_pins);
-//
-//	//printf("before setup\n");
-//	//nrf_dump_regs(&nrf24);
-//
-//	nrf24_mode_power_down(&nrf24);
-//	nrf24_rf_config_t nrf_config;
-//	nrf_config.data_rate = NRF24_DATARATE_250_KBIT;
-//	nrf_config.tx_power = NRF24_TXPOWER_MINUS_0_DBM;
-//	nrf_config.rf_channel = 10;		//101;
-//	nrf24_setup_rf(&nrf24, &nrf_config);
-//	nrf24_protocol_config_t nrf_protocol_config;
-//	nrf_protocol_config.crc_size = NRF24_CRCSIZE_1BYTE;
-//	nrf_protocol_config.address_width = NRF24_ADDRES_WIDTH_5_BYTES;
-//	nrf_protocol_config.en_dyn_payload_size = true;
-//	nrf_protocol_config.en_ack_payload = false;
-//	nrf_protocol_config.en_dyn_ack = false;
-//	nrf_protocol_config.auto_retransmit_count = 0;
-//	nrf_protocol_config.auto_retransmit_delay = 0;
-//	nrf24_setup_protocol(&nrf24, &nrf_protocol_config);
-//	nrf24_pipe_set_tx_addr(&nrf24, 0xacacacacac);
-//
-//	nrf24_pipe_config_t pipe_config;
-//	for (int i = 1; i < 6; i++)
-//	{
-//		pipe_config.address = 0xacacacacac;
-//		pipe_config.address = (pipe_config.address & ~((uint64_t)0xff << 32)) | ((uint64_t)(i + 7) << 32);
-//		pipe_config.enable_auto_ack = false;
-//		pipe_config.payload_size = -1;
-//		nrf24_pipe_rx_start(&nrf24, i, &pipe_config);
-//	}
-//
-//	pipe_config.address = 0xafafafaf01;
-//	pipe_config.enable_auto_ack = false;
-//	pipe_config.payload_size = -1;
-//	nrf24_pipe_rx_start(&nrf24, 0, &pipe_config);
-//
-//	nrf24_mode_standby(&nrf24);
-//	printf("\n\n");
-//	printf("after setup\n");
-//	//nrf_dump_regs(&nrf24);
-//	printf("\n\n");
-//	nrf24_mode_tx(&nrf24);
+
 
 	// Инициализация ad5593
 	setup_adc();
@@ -342,6 +306,11 @@ int app_main(){
 
 	pack1_t pack1 = {0};
 	pack2_t pack2 = {0};
+	gps_init();
+	gps_work();
+
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_ERR);
 
 	int a = 0;
 
@@ -405,6 +374,11 @@ int app_main(){
 			pack1.mag[i] = magg[i];
 		}
 
+		//gps
+		gps_work();
+		gps_get_coords(&cookie, &lat, &lon, &alt, &fix);
+		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
+
 			num1 += 1;
 
 			pack1.num = num1;
@@ -453,6 +427,22 @@ int app_main(){
 			HAL_Delay(100);
 			HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
 			HAL_Delay(100);
+
+			uint8_t lidar[18];
+			HAL_UART_Receive(&huart6, lidar, 18, 100);
+
+			for(int i = 0; i < 9; i++){
+				if ((lidar[0] != 0x59) || (lidar[1] != 0x59)){
+					for(int j = 0; j < 17; j++){
+						lidar[j] = lidar[j + 1];
+					}
+				}
+			}
+
+			uint16_t lidar_1 = (lidar[3] << 8) | lidar[2];
+
+			//uint16_t crc_lidar = lidar[0] + lidar[0] + lidar[1] + lidar[0] + lidar[1] + lidar[2] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[7];
+			//uint16_t crc_lidar_8 = crc_lidar & 0x00FF;
 
 
 
