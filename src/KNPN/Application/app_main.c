@@ -26,6 +26,7 @@
 #include "structs.h"
 #include <fatfs.h>
 #include "AD5593/ad5593.h"
+#include "CCS811.h"
 
 extern SPI_HandleTypeDef hspi1;
 //extern SPI_HandleTypeDef hspi4;
@@ -335,6 +336,10 @@ int app_main(){
 
 	//test_adc();
 
+	uint16_t co2, tvoc;
+
+	CCS811_Init();
+
 	while(1){
 
 		if(is_mount != FR_OK) {
@@ -379,6 +384,13 @@ int app_main(){
 		gps_get_coords(&cookie, &lat, &lon, &alt, &fix);
 		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
 
+
+		CCS811_SetEnvironmentalData(45.0f, 24.0f); // 45% RH, 24°C
+
+		if (CCS811_DataAvailable())
+	    {
+		    CCS811_ReadAlgorithmResults(&co2, &tvoc);
+	    }
 			num1 += 1;
 
 			pack1.num = num1;
