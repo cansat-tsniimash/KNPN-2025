@@ -25,7 +25,7 @@ class UiLoader(QtUiTools.QUiLoader):
 
 class DataManager(QtCore.QObject):
     new_data = QtCore.Signal(list)
-    @Slot(int)
+    #@Slot(int)
     def add_new_data (data):
         if len(data) == 50:
             unpack_data = struct.unpack("<BHI10hIh3fBhH", data)
