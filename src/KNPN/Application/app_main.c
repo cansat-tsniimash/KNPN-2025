@@ -262,6 +262,7 @@ int app_main(){
 	uint32_t gps_time_us;
 	uint16_t num1 = 0 ;
 	uint16_t num2 = 0 ;
+
 //сдвиговый регистр
 	shift_reg_t shift_reg_r;
 	shift_reg_r.bus = &hspi1;
@@ -276,19 +277,20 @@ int app_main(){
 
 //стх и структура лcмa
 	stmdev_ctx_t ctx_lsm;
-	struct lsm_spi_intf_sr lsm_sr;
-	lsm_sr.sr_pin = 6;
-	lsm_sr.spi = &hspi1;
-	lsm_sr.sr = &shift_reg_r;
-	lsmset_sr(&ctx_lsm, &lsm_sr);
+	struct lsm_spi_intf lsm;
+	lsm.GPIO_Port = GPIOA;
+	lsm.GPIO_Pin = GPIO_PIN_9;
+	lsm.spi = &hspi1;
+	lsmset(&ctx_lsm, &lsm);
+
 
 //стх и структура лиса
 	stmdev_ctx_t ctx_lis;
-	struct lis_spi_intf_sr lis_sr;
-	lis_sr.sr_pin = 2;
-	lis_sr.spi = &hspi1;
-	lis_sr.sr = &shift_reg_r;
-	lisset_sr(&ctx_lis, &lis_sr);
+	struct lis_spi_intf lis;
+	lis.spi = &hspi1;
+	lis.GPIO_Port = GPIOA;
+	lis.GPIO_Pin = GPIO_PIN_10;
+	lisset(&ctx_lis, &lis);
 
 
 
@@ -330,10 +332,18 @@ int app_main(){
 	//uint8_t result[11] = {0};
 	//HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
 	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
 */
 
-
-
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
+/*
+	shift_reg_write_bit_8(&shift_reg_r, 1, 1);
+	HAL_Delay(3000);
+	shift_reg_write_bit_8(&shift_reg_r, 1, 0);
+*/
 	//test_adc();
 
 	uint16_t co2, tvoc;
@@ -341,6 +351,9 @@ int app_main(){
 	CCS811_Init();
 
 	while(1){
+
+
+
 
 		if(is_mount != FR_OK) {
 
@@ -352,9 +365,9 @@ int app_main(){
 			test_adc();
 
 			f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла
-			f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+			f_puts("flag; num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar; crc\n", &File_1csv);
 			f_open(&File_2csv, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла
-			f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File_2csv);
+			f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
 			f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND); // открытие файла
 		}
 
@@ -385,122 +398,123 @@ int app_main(){
 		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
 
 
-		CCS811_SetEnvironmentalData(45.0f, 24.0f); // 45% RH, 24°C
+		CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
 
 		if (CCS811_DataAvailable())
 	    {
 		    CCS811_ReadAlgorithmResults(&co2, &tvoc);
 	    }
-			num1 += 1;
+		num1 += 1;
 
-			pack1.num = num1;
-			pack1.time_ms = HAL_GetTick();
-			pack1.flag = 0xAA;
-			pack1.bme_height = height;
-			pack1.bme_humidity = bmp_humidity;
-			pack1.bme_press = bmp_press;
-			pack1.bme_temp = bmp_temp;
-			pack1.lidar = 666;
-			pack1.lux_board = foto_state;
-			pack1.lux_sp = foto_sp;
-			pack1.state = 0;
-			pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+		pack1.num = num1;
+		pack1.time_ms = HAL_GetTick();
+		pack1.flag = 0xAA;
+		pack1.bme_height = height;
+		pack1.bme_humidity = bmp_humidity;
+		pack1.bme_press = bmp_press;
+		pack1.bme_temp = bmp_temp;
+		pack1.lidar = 666;
+		pack1.lux_board = foto_state;
+		pack1.lux_sp = foto_sp;
+		pack1.state = 0;
+		pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
-			num2 += 1;
+		num2 += 1;
 
-			pack2.num = num2;
-			pack2.time_ms = HAL_GetTick();
-			pack2.flag = 0xBB;
-			pack2.MICS_CO = R_MICS_CO;
-			pack2.MICS_NH3 = R_MICS_NH3;
-			pack2.MICS_NO2 = R_MICS_NO2;
-			pack2.MICS_5524 = R_MICS_5524;
-			pack2.CCS_TVOC = 666;
-			pack2.CCS_CO2 = 666;
-			pack2.lat = 666;
-			pack2.lon = 666;
-			pack2.alt = 666;
-			pack2.gps_time_s = 666;
-			pack2.fix = 666;
-			pack2.bme_humidity_g = 666;
-			pack2.bme_press_g = 666;
-			pack2.bme_temp_g = 666;
-			pack2.bus_voltage = 666;
-			pack2.current = 666;
-			pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
+		pack2.num = num2;
+		pack2.time_ms = HAL_GetTick();
+		pack2.flag = 0xBB;
+		pack2.MICS_CO = R_MICS_CO;
+		pack2.MICS_NH3 = R_MICS_NH3;
+		pack2.MICS_NO2 = R_MICS_NO2;
+		pack2.MICS_5524 = R_MICS_5524;
+		pack2.CCS_TVOC = 666;
+		pack2.CCS_CO2 = 666;
+		pack2.lat = 666;
+		pack2.lon = 666;
+		pack2.alt = 666;
+		pack2.gps_time_s = 666;
+		pack2.fix = 666;
+		pack2.bme_humidity_g = 666;
+		pack2.bme_press_g = 666;
+		pack2.bme_temp_g = 666;
+		pack2.bus_voltage = 666;
+		pack2.current = 666;
+		pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
 
-			int size_pack1 = sizeof(pack1);
-			int size_pack2 = sizeof(pack2);
 
-			HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
-			HAL_Delay(100);
-			HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
-			HAL_Delay(100);
+		int size_pack1 = sizeof(pack1);
+		int size_pack2 = sizeof(pack2);
 
-			uint8_t lidar[18];
-			HAL_UART_Receive(&huart6, lidar, 18, 100);
+		HAL_StatusTypeDef tr;
 
-			for(int i = 0; i < 9; i++){
-				if ((lidar[0] != 0x59) || (lidar[1] != 0x59)){
-					for(int j = 0; j < 17; j++){
-						lidar[j] = lidar[j + 1];
-					}
+		HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
+		HAL_Delay(100);
+		HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
+		HAL_Delay(100);
+
+		uint8_t lidar[18];
+		HAL_UART_Receive(&huart6, lidar, 18, 100);
+
+		for(int i = 0; i < 9; i++){
+			if ((lidar[0] != 0x59) || (lidar[1] != 0x59)){
+				for(int j = 0; j < 17; j++){
+					lidar[j] = lidar[j + 1];
 				}
 			}
+		}
 
-			uint16_t lidar_1 = (lidar[3] << 8) | lidar[2];
+		uint16_t lidar_1 = (lidar[3] << 8) | lidar[2];
 
-			//uint16_t crc_lidar = lidar[0] + lidar[0] + lidar[1] + lidar[0] + lidar[1] + lidar[2] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[7];
-			//uint16_t crc_lidar_8 = crc_lidar & 0x00FF;
-
-
-
-			switch(sd_state) {
-				case SD_PACK_1:
+		//uint16_t crc_lidar = lidar[0] + lidar[0] + lidar[1] + lidar[0] + lidar[1] + lidar[2] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[7];
+		//uint16_t crc_lidar_8 = crc_lidar & 0x00FF;
 
 
-					if (res1csv == FR_OK){
-						num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
 
-						res1csv = f_write(&File_1csv,str_buf,num_written, &Bytes); // отправка на запись в файл
-						res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-					}
-					if (resb == FR_OK){
-						resb = f_write(&File_b,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
-						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-					}
-					a++;
-					sd_state = SD_WAIT;
-				break;
-
-				case SD_PACK_2:
+		switch(sd_state) {
+			case SD_PACK_1:
 
 
-					if (res2csv == FR_OK){
-						num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
+				if (res1csv == FR_OK){
+					num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
 
-						res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
-						res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-					}
-					if (resb == FR_OK){
-						resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
-						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
-					}
+					res1csv = f_write(&File_1csv,str_buf,num_written, &Bytes); // отправка на запись в файл
+					res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+				}
+				if (resb == FR_OK){
+					resb = f_write(&File_b,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
+					resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+				}
+			a++;
+			sd_state = SD_WAIT;
+			break;
 
-					sd_state = SD_WAIT;
-					a=0;
-				break;
+			case SD_PACK_2:
 
-				case SD_WAIT:
-					if(a == 4)
-						sd_state = SD_PACK_2;
-					else
-						sd_state = SD_PACK_1;
 
-				break;
+				if (res2csv == FR_OK){
+					num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
+
+					res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
+					res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+				}
+				if (resb == FR_OK){
+					resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
+					resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+				}
+
+				sd_state = SD_WAIT;
+				a=0;
+			break;
+
+			case SD_WAIT:
+				if(a == 4)
+					sd_state = SD_PACK_2;
+				else
+					sd_state = SD_PACK_1;
+
+			break;
 
 
 

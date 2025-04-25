@@ -59,10 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define CE_Pin GPIO_PIN_13
 #define CE_GPIO_Port GPIOC
-#define CS_Pin GPIO_PIN_14
-#define CS_GPIO_Port GPIOC
-#define IRQ_Pin GPIO_PIN_15
-#define IRQ_GPIO_Port GPIOC
 #define LATCH_SR_Pin GPIO_PIN_14
 #define LATCH_SR_GPIO_Port GPIOB
 #define OE_SR_Pin GPIO_PIN_8

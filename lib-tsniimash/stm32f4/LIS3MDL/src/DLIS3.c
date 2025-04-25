@@ -43,7 +43,7 @@ void lisset(stmdev_ctx_t *ctx, struct lis_spi_intf *spi_interface)
 {
 // Настройка lismdl =-=-=-=-=-=-=-=-=-=-=-=-
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	ctx->handle = NULL;
+	ctx->handle = spi_interface;
 	ctx->read_reg = lis3mdl_read;
 	ctx->write_reg = lis3mdl_write;
 
