@@ -278,9 +278,9 @@ int app_main(){
 //стх и структура лcмa
 	stmdev_ctx_t ctx_lsm;
 	struct lsm_spi_intf lsm;
+	lsm.spi = &hspi1;
 	lsm.GPIO_Port = GPIOA;
 	lsm.GPIO_Pin = GPIO_PIN_9;
-	lsm.spi = &hspi1;
 	lsmset(&ctx_lsm, &lsm);
 
 
