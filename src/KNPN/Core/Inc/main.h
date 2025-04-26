@@ -57,8 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CE_Pin GPIO_PIN_13
-#define CE_GPIO_Port GPIOC
 #define LATCH_SR_Pin GPIO_PIN_14
 #define LATCH_SR_GPIO_Port GPIOB
 #define OE_SR_Pin GPIO_PIN_8

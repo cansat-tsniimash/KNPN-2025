@@ -319,32 +319,32 @@ int app_main(){
 
 	uint16_t num_written;
 
+
 /*
-	//uint Bytes;
-	//char message[] = ".|.";
-	//uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
-	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
-	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, SET);
-	//HAL_UART_Transmit(&huart1, settings, sizeof(settings), HAL_MAX_DELAY);
-	//HAL_UART_Receive(&huart1, settings, 3, HAL_MAX_DELAY);
+	uint Bytes;
+	char message[] = ".|.";
+	uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
 
-	//uint8_t settings1[] = {0xC1, 0x00, 0x08};
-	//uint8_t result[11] = {0};
-	//HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
-	//HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart1, settings, sizeof(settings), HAL_MAX_DELAY);
+	HAL_UART_Receive(&huart1, settings, 3, HAL_MAX_DELAY);
 
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
-*/
+	uint8_t settings1[] = {0xC1, 0x00, 0x08};
+	uint8_t result[11] = {0};
+	HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
+	HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
-/*
 	shift_reg_write_bit_8(&shift_reg_r, 1, 1);
 	HAL_Delay(3000);
 	shift_reg_write_bit_8(&shift_reg_r, 1, 0);
+	uint8_t buf[3] = {0xC1, 0, 9};
+	HAL_UART_Transmit(&huart1, buf, 3, HAL_MAX_DELAY);
 */
 	//test_adc();
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
+
+
 
 	uint16_t co2, tvoc;
 
