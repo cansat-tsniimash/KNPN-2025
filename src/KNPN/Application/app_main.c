@@ -155,12 +155,12 @@ static int setup_adc()
 
 
 
-	float foto_sp;
-	float foto_state;
-	uint16_t R_MICS_5524;
-	uint16_t R_MICS_CO;
-	uint16_t R_MICS_NO2;
-	uint16_t R_MICS_NH3;
+float foto_sp;
+float foto_state;
+uint16_t R_MICS_5524;
+uint16_t R_MICS_CO;
+uint16_t R_MICS_NO2;
+uint16_t R_MICS_NH3;
 
 
 static void test_adc()
@@ -179,12 +179,12 @@ static void test_adc()
 		ad5593_channel_id_t channel_4 = channels[4];
 		ad5593_channel_id_t channel_5 = channels[5];
 
-		ad5593_adc_read(dev, channel_0, &R_MICS_5524);
-		ad5593_adc_read(dev, channel_1, &R_MICS_CO);
-		ad5593_adc_read(dev, channel_2, &R_MICS_NO2);
-		ad5593_adc_read(dev, channel_3, &R_MICS_NH3);
-		ad5593_adc_read(dev, channel_4, (uint16_t*)&foto_sp);
-		ad5593_adc_read(dev, channel_5, (uint16_t*)&foto_state);
+		ad5593_adc_read(dev, channel_5, &R_MICS_5524);
+		ad5593_adc_read(dev, channel_3, &R_MICS_CO);
+		ad5593_adc_read(dev, channel_4, &R_MICS_NO2);
+		ad5593_adc_read(dev, channel_2, &R_MICS_NH3);
+		ad5593_adc_read(dev, channel_1, (uint16_t*)&foto_sp);
+		ad5593_adc_read(dev, channel_0, (uint16_t*)&foto_state);
 
 		float volts_sp = foto_sp * 3.3 / 4095;  //Volts
 		float ohms_sp = volts_sp*(3300)/(3.3-volts_sp);    //Ohms
@@ -320,25 +320,24 @@ int app_main(){
 	uint16_t num_written;
 
 
+
+	uint8_t settings_datarate[] = {0xC0, 0x02, 0x01, 0x62};
+	uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x17};
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, SET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, SET);
+
+	HAL_UART_Transmit(&huart1, settings_datarate, sizeof(settings_datarate), HAL_MAX_DELAY);
+	HAL_Delay(1000);
+	HAL_UART_Transmit(&huart1, settings_channel, sizeof(settings_channel), HAL_MAX_DELAY);
+
 /*
-	uint Bytes;
-	char message[] = ".|.";
-	uint8_t settings[] = {0xC0, 0x04, 0x01, 0x17};
-
-	HAL_UART_Transmit(&huart1, settings, sizeof(settings), HAL_MAX_DELAY);
-	HAL_UART_Receive(&huart1, settings, 3, HAL_MAX_DELAY);
-
 	uint8_t settings1[] = {0xC1, 0x00, 0x08};
 	uint8_t result[11] = {0};
 	HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
 	HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
-
-	shift_reg_write_bit_8(&shift_reg_r, 1, 1);
-	HAL_Delay(3000);
-	shift_reg_write_bit_8(&shift_reg_r, 1, 0);
-	uint8_t buf[3] = {0xC1, 0, 9};
-	HAL_UART_Transmit(&huart1, buf, 3, HAL_MAX_DELAY);
 */
+
 	//test_adc();
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
