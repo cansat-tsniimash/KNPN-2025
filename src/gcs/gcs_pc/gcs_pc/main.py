@@ -6,7 +6,7 @@ from socket import *
 
 import struct
 
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from PySide2 import QtUiTools, QtGui, QtCore
 
 #from PyQt5 import QtWidgets, uic, QtCore
@@ -24,10 +24,13 @@ class UiLoader(QtUiTools.QUiLoader):
         return super().createWidget(className, parent, name)
 
 class DataManager(QtCore.QObject):
-    new_data_p1 = QtCore.Signal(list)
-    new_data_p2 = QtCore.Signal(list)
+    new_pack_1 = QtCore.Signal(list)
+    new_pack_2 = QtCore.Signal(list)
+    mutex = QtCore.QMutex()
+
+
     def start(self):
-        host = '192.168.0.203'
+        host = '192.168.120.217'
         port = 22000
         addr = (host,port)
 
@@ -37,7 +40,9 @@ class DataManager(QtCore.QObject):
         udp_socket.sendto(b"h", addr)
         data = []
 
-        while True:
+        self.close = True
+
+        while close:
             try:
                 data, addr = udp_socket.recvfrom(53)
             except Exception as e:
@@ -53,11 +58,14 @@ class DataManager(QtCore.QObject):
             except Exception as e:
                 print(e)
                 pass
+            self.mutex.lock()
+            close = self.close
+            self.mutex.unlock()
 
     def pars_packet(self, data):
         if len(data) == 50:
             unpack_data = struct.unpack("<BHI10hIh3fBhH", data)
-            self.new_data_p1.emit(unpack_data)
+            self.new_pack_1.emit(unpack_data)
             print ("Time_ms", unpack_data[2])
             print ("Accelerometer x", unpack_data[3]*488/1000/1000)
             print ("Accelerometer y", unpack_data[4]*488/1000/1000)
@@ -80,7 +88,7 @@ class DataManager(QtCore.QObject):
             print ("\n")
         elif len(data) == 53:
             unpack_data = struct.unpack("<BHIh3fIf7HhIhH", data)
-            self.new_data_p2.emit(unpack_data)
+            self.new_pack_2.emit(unpack_data)
             print ("Number", unpack_data[1])
             print ("Time_ms", unpack_data[2])
             print ("Fix", unpack_data[3])
@@ -104,6 +112,10 @@ class DataManager(QtCore.QObject):
         else:
             print("You are IDIOT!!!!!!!!!!!")
 
+    def stop(self):
+        self.mutex.lock()
+        self.close = False
+        self.mutex.unlock()
 
 
 class gcs(QMainWindow):
@@ -130,17 +142,15 @@ class gcs(QMainWindow):
         #self.pen.setWidth(0.1)
 
         #self.plot1_list[0].setPen(self.pen)
-
         self.data_manager = DataManager()
 
         self.data_thread = QtCore.QThread(self)
         self.data_manager.moveToThread(self.data_thread)
         self.data_thread.started.connect(self.data_manager.start)
-        self.data_thread.start()
 
-        self.data_manager.new_data_p1.connect(self.add_new_data_p1)
-        self.data_manager.new_data_p2.connect(self.add_new_data_p2)
-
+        self.ui.Stop.clicked.connect(self.stop_action)
+        self.ui.Start.clicked.connect(self.start_action)
+        self.ui.Reset.clicked.connect(self.reset_action)
 
 
     def load_ui(self):
@@ -158,7 +168,7 @@ class gcs(QMainWindow):
         axis_y.setLabel(name)
         plot.setAxisItems({'bottom': axis_x, 'left': axis_y})
 
-    def set_line(self, plot, coordinate_x, coordinate_y, color, name):
+    def set_line(self, plot, color, name):
 
         line = plot.plot(x=[0], y=[0], name=name)
 
@@ -203,64 +213,121 @@ class gcs(QMainWindow):
         self.legend8 = self.ui.Gases_consentration.addLegend()
         self.legend9 = self.ui.Illumination.addLegend()
 
-        self.Accelerometer =       [self.set_line(self.ui.Accelerometer,       [0,1], [1,0],    "#0000FF", "x"),
-                                    self.set_line(self.ui.Accelerometer,       [0,1], [0.5,0],  "#00FF00", "y"),
-                                    self.set_line(self.ui.Accelerometer,       [0,1], [0.25,0], "#FF0000", "z")]
-        self.Gyroscope =           [self.set_line(self.ui.Giroscope,           [0,1], [1,0],    "#0000FF", "x"),
-                                    self.set_line(self.ui.Giroscope,           [0,1], [0.5,0],  "#00FF00", "y"),
-                                    self.set_line(self.ui.Giroscope,           [0,1], [0.25,0], "#FF0000", "z")]
-        self.Magnetometer =        [self.set_line(self.ui.Magnetometer,        [0,1], [1,0],    "#0000FF", "x"),
-                                    self.set_line(self.ui.Magnetometer,        [0,1], [0.5,0],  "#00FF00", "y"),
-                                    self.set_line(self.ui.Magnetometer,        [0,1], [0.25,0], "#FF0000", "z")]
-        self.Pressure =            [self.set_line(self.ui.Pressure,            [0,1], [1,0],    "#0000FF", "Outside"),
-                                    self.set_line(self.ui.Pressure,            [0,1], [0.5,0],  "#00FF00", "Germo")]
-        self.Height =              [self.set_line(self.ui.Height,              [0,1], [1,0],    "#0000FF", "BME-280 out"),
-                                    self.set_line(self.ui.Height,              [0,1], [0.5,0],  "#00FF00", "GPS")]
-        self.Temperature =         [self.set_line(self.ui.Temperature,         [0,1], [1,0],    "#0000FF", "Outside"),
-                                    self.set_line(self.ui.Temperature,         [0,1], [0.5,0],  "#00FF00", "Germo")]
-        self.Gases_consentration = [self.set_line(self.ui.Gases_consentration, [0,1], [1.5,0],  "#0000FF", "MICS-6814 CO"),
-                                    self.set_line(self.ui.Gases_consentration, [0,1], [1.25,0], "#00FF00", "MICS-6814 NO2"),
-                                    self.set_line(self.ui.Gases_consentration, [0,1], [1,0],    "#FF0000", "MICS-6814 NH3"),
-                                    self.set_line(self.ui.Gases_consentration, [0,1], [0.5,0],  "#F0F000", "MICS-5524"),
-                                    self.set_line(self.ui.Gases_consentration, [0,1], [0.25,0], "#1FF0D5", "CCS811 CO2"),
-                                    self.set_line(self.ui.Gases_consentration, [0,1], [0.15,0], "#FF00F0", "CCS811 TVOC")]
-        self.SP_parameters =       [self.set_line(self.ui.SP_parameters,       [0,1], [1,0],    "#0000FF", "Current, A"),
-                                    self.set_line(self.ui.SP_parameters,       [0,1], [0.5,0],  "#00FF00", "Voultage, V")]
-        self.Illumination =        [self.set_line(self.ui.Illumination,        [0,1], [1,0],    "#0000FF", "SP"),
-                                    self.set_line(self.ui.Illumination,        [0,1], [0.5,0],  "#00FF00", "Board")]
-        #self.add_data(self.Accelerometer[0], [4, 6], [5, 8])
-        #self.add_data(self.Accelerometer[1], [4, 7], [5, 8])
-        #self.add_data(self.Accelerometer[2], [4, 8], [5, 8])
+        self.Accelerometer =       [self.set_line(self.ui.Accelerometer,       "#0000FF", "x"),
+                                    self.set_line(self.ui.Accelerometer,       "#00FF00", "y"),
+                                    self.set_line(self.ui.Accelerometer,       "#FF0000", "z")]
+        self.Giroscope =           [self.set_line(self.ui.Giroscope,           "#0000FF", "x"),
+                                    self.set_line(self.ui.Giroscope,           "#00FF00", "y"),
+                                    self.set_line(self.ui.Giroscope,           "#FF0000", "z")]
+        self.Magnetometer =        [self.set_line(self.ui.Magnetometer,        "#0000FF", "x"),
+                                    self.set_line(self.ui.Magnetometer,        "#00FF00", "y"),
+                                    self.set_line(self.ui.Magnetometer,        "#FF0000", "z")]
+        self.Pressure =            [self.set_line(self.ui.Pressure,            "#0000FF", "Outside"),
+                                    self.set_line(self.ui.Pressure,            "#00FF00", "Germo")]
+        self.Height =              [self.set_line(self.ui.Height,              "#0000FF", "BME-280 out"),
+                                    self.set_line(self.ui.Height,              "#00FF00", "GPS")]
+        self.Temperature =         [self.set_line(self.ui.Temperature,         "#0000FF", "Outside"),
+                                    self.set_line(self.ui.Temperature,         "#00FF00", "Germo")]
+        self.Gases_consentration = [self.set_line(self.ui.Gases_consentration, "#0000FF", "MICS-6814 CO"),
+                                    self.set_line(self.ui.Gases_consentration, "#00FF00", "MICS-6814 NO2"),
+                                    self.set_line(self.ui.Gases_consentration, "#FF0000", "MICS-6814 NH3"),
+                                    self.set_line(self.ui.Gases_consentration, "#F0F000", "MICS-5524"),
+                                    self.set_line(self.ui.Gases_consentration, "#1FF0D5", "CCS811 CO2"),
+                                    self.set_line(self.ui.Gases_consentration, "#FF00F0", "CCS811 TVOC")]
+        self.SP_parameters =       [self.set_line(self.ui.SP_parameters,       "#0000FF", "Current, A"),
+                                    self.set_line(self.ui.SP_parameters,       "#00FF00", "Voultage, V")]
+        self.Illumination =        [self.set_line(self.ui.Illumination,        "#0000FF", "SP"),
+                                    self.set_line(self.ui.Illumination,        "#00FF00", "Board")]
+        #self.add_data(self.Gases_consentration[0], NumPy.array([5]), NumPy.array([5]))
 
     #@Slot(list)
-    def add_new_data_p1 (self, new_data_p1):
-        self.add_data(self.Accelerometer[0], [new_data_p1[2]], [new_data_p1[3]])
-        self.add_data(self.Accelerometer[1], [new_data_p1[2]], [new_data_p1[4]])
-        self.add_data(self.Accelerometer[2], [new_data_p1[2]], [new_data_p1[5]])
-        self.add_data(self.Gyroscope[0], [new_data_p1[2]], [new_data_p1[6]])
-        self.add_data(self.Gyroscope[1], [new_data_p1[2]], [new_data_p1[7]])
-        self.add_data(self.Gyroscope[2], [new_data_p1[2]], [new_data_p1[8]])
-        self.add_data(self.Magnetometer[0], [new_data_p1[2]], [new_data_p1[9]])
-        self.add_data(self.Magnetometer[1], [new_data_p1[2]], [new_data_p1[10]])
-        self.add_data(self.Magnetometer[2], [new_data_p1[2]], [new_data_p1[11]])
-        self.add_data(self.Pressure[0], [new_data_p1[2]], [new_data_p1[13]])
-        self.add_data(self.Height[0], [new_data_p1[2]], [new_data_p1[15]])
-        self.add_data(self.Temperature[0], [new_data_p1[2]], [new_data_p1[12]])
-        self.add_data(self.Illumination[0], [new_data_p1[2]], [new_data_p1[16]])
-        self.add_data(self.Illumination[1], [new_data_p1[2]], [new_data_p1[17]])
+    def add_new_pack_1(self, unpack_data):
+        self.add_data(self.Accelerometer[0], unpack_data[2], unpack_data[3]*488/1000/1000)
+        self.add_data(self.Accelerometer[1], unpack_data[2], unpack_data[4]*488/1000/1000)
+        self.add_data(self.Accelerometer[2], unpack_data[2], unpack_data[5]*488/1000/1000)
+        self.add_data(self.Giroscope[0], unpack_data[2], unpack_data[6]*70/1000)
+        self.add_data(self.Giroscope[1], unpack_data[2], unpack_data[7]*70/1000)
+        self.add_data(self.Giroscope[2], unpack_data[2], unpack_data[8]*70/1000)
+        self.add_data(self.Magnetometer[0], unpack_data[2], unpack_data[9]/1711)
+        self.add_data(self.Magnetometer[1], unpack_data[2], unpack_data[10]/1711)
+        self.add_data(self.Magnetometer[2], unpack_data[2], unpack_data[11]/1711)
+        self.add_data(self.Temperature[0], unpack_data[2], unpack_data[12])
+        self.add_data(self.Pressure[0], unpack_data[2], unpack_data[13])
+        self.add_data(self.Height[0], unpack_data[2], unpack_data[16])
+        self.add_data(self.Illumination[0], unpack_data[2], unpack_data[17])
+        self.add_data(self.Illumination[1], unpack_data[2], unpack_data[18])
+
+        self.ui.Packet1.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
+        self.ui.Packet1.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
+        self.ui.Packet1.setItem(2, 1, QTableWidgetItem(str(unpack_data[3]*488/1000/1000)))
+        self.ui.Packet1.setItem(3, 1, QTableWidgetItem(str(unpack_data[4]*488/1000/1000)))
+        self.ui.Packet1.setItem(4, 1, QTableWidgetItem(str(unpack_data[5]*488/1000/1000)))
+        self.ui.Packet1.setItem(5, 1, QTableWidgetItem(str(unpack_data[6]*70/1000)))
+        self.ui.Packet1.setItem(6, 1, QTableWidgetItem(str(unpack_data[7]*70/1000)))
+        self.ui.Packet1.setItem(7, 1, QTableWidgetItem(str(unpack_data[8]*70/1000)))
+        self.ui.Packet1.setItem(8, 1, QTableWidgetItem(str(unpack_data[9]/1711)))
+        self.ui.Packet1.setItem(9, 1, QTableWidgetItem(str(unpack_data[10]/1711)))
+        self.ui.Packet1.setItem(10, 1, QTableWidgetItem(str(unpack_data[11]/1711)))
+        self.ui.Packet1.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
+        self.ui.Packet1.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
+        self.ui.Packet1.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
+        self.ui.Packet1.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
+        self.ui.Packet1.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
+        self.ui.Packet1.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
+        self.ui.Packet1.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
+        self.ui.Packet1.setItem(18, 1, QTableWidgetItem(str(unpack_data[19])))
+
+
+
     #@Slot(list)
-    def add_new_data_p2 (self, new_data_p2):
-        self.add_data(self.Height[1], [new_data_p2[2]], [new_data_p2[6]])
-        self.add_data(self.SP_parameters[0], [new_data_p2[2]], [new_data_p2[8]])
-        self.add_data(self.SP_parameters[1], [new_data_p2[2]], [new_data_p2[9]])
-        self.add_data(self.Gases_consentration[0], [new_data_p2[2]], [new_data_p2[10]])
-        self.add_data(self.Gases_consentration[1], [new_data_p2[2]], [new_data_p2[11]])
-        self.add_data(self.Gases_consentration[2], [new_data_p2[2]], [new_data_p2[12]])
-        self.add_data(self.Gases_consentration[3], [new_data_p2[2]], [new_data_p2[13]])
-        self.add_data(self.Gases_consentration[4], [new_data_p2[2]], [new_data_p2[14]])
-        self.add_data(self.Gases_consentration[5], [new_data_p2[2]], [new_data_p2[15]])
-        self.add_data(self.Pressure[1], [new_data_p2[2]], [new_data_p2[17]])
-        self.add_data(self.Temperature[1], [new_data_p2[2]], [new_data_p2[16]])
+    def add_new_pack_2(self, unpack_data):
+        self.add_data(self.Height[1], unpack_data[2], unpack_data[6])
+        self.add_data(self.SP_parameters[0], unpack_data[2], unpack_data[8])
+        self.add_data(self.SP_parameters[1], unpack_data[2], unpack_data[9])
+        self.add_data(self.Gases_consentration[0], unpack_data[2], unpack_data[10])
+        self.add_data(self.Gases_consentration[1], unpack_data[2], unpack_data[11])
+        self.add_data(self.Gases_consentration[2], unpack_data[2], unpack_data[12])
+        self.add_data(self.Gases_consentration[3], unpack_data[2], unpack_data[13])
+        self.add_data(self.Gases_consentration[4], unpack_data[2], unpack_data[14])
+        self.add_data(self.Gases_consentration[5], unpack_data[2], unpack_data[15])
+        self.add_data(self.Temperature[1], unpack_data[2], unpack_data[16])
+        self.add_data(self.Pressure[1], unpack_data[2], unpack_data[17])
+
+        self.ui.Packet2.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
+        self.ui.Packet2.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
+        self.ui.Packet2.setItem(2, 1, QTableWidgetItem(str(unpack_data[3])))
+        self.ui.Packet2.setItem(3, 1, QTableWidgetItem(str(unpack_data[4])))
+        self.ui.Packet2.setItem(4, 1, QTableWidgetItem(str(unpack_data[5])))
+        self.ui.Packet2.setItem(5, 1, QTableWidgetItem(str(unpack_data[6])))
+        self.ui.Packet2.setItem(6, 1, QTableWidgetItem(str(unpack_data[7])))
+        self.ui.Packet2.setItem(7, 1, QTableWidgetItem(str(unpack_data[8])))
+        self.ui.Packet2.setItem(8, 1, QTableWidgetItem(str(unpack_data[9])))
+        self.ui.Packet2.setItem(9, 1, QTableWidgetItem(str(unpack_data[10])))
+        self.ui.Packet2.setItem(10, 1, QTableWidgetItem(str(unpack_data[11])))
+        self.ui.Packet2.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
+        self.ui.Packet2.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
+        self.ui.Packet2.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
+        self.ui.Packet2.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
+        self.ui.Packet2.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
+        self.ui.Packet2.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
+        self.ui.Packet2.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
+
+    def start_action(self):
+        self.data_thread.start()
+
+    def stop_action(self):
+        self.data_manager.stop()
+
+    def reset_action(self):
+        self.ui.clear_all(self.Accelerometer)
+        self.ui.clear_all(self.Giroscope)
+        self.ui.clear_all(self.Magnetometer)
+        self.ui.clear_all(self.Pressure)
+        self.ui.clear_all(self.Height)
+        self.ui.clear_all(self.Temperature)
+        self.ui.clear_all(self.Gases_consentration)
+        self.ui.clear_all(self.SP_parameters)
+        self.ui.clear_all(self.Illumination)
 
 if __name__ == "__main__":
     app = QApplication([])
