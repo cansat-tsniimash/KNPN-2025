@@ -24,70 +24,10 @@ class UiLoader(QtUiTools.QUiLoader):
         return super().createWidget(className, parent, name)
 
 class DataManager(QtCore.QObject):
-    new_data = QtCore.Signal(list)
-    #@Slot(int)
-    def add_new_data (data):
-        if len(data) == 50:
-            unpack_data = struct.unpack("<BHI10hIh3fBhH", data)
-            self.new_data.emit(unpack_data)
-            add_data(self.ui.Accelerometer, unpack_data[2], unpack_data[3]*488/1000/1000)
-            add_data(self.ui.Accelerometer, unpack_data[2], unpack_data[4]*488/1000/1000)
-            add_data(self.ui.Accelerometer, unpack_data[2], unpack_data[5]*488/1000/1000)
-            add_data(self.ui.Giroscope, unpack_data[2], unpack_data[6]*70/1000)
-            add_data(self.ui.Giroscope, unpack_data[2], unpack_data[7]*70/1000)
-            add_data(self.ui.Giroscope, unpack_data[2], unpack_data[8]*70/1000)
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[9]/1711)
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[10]/1711)
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[11]/1711)
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[12])
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[12])
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[12])
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[12])
-            add_data(self.ui.Magnetometer, unpack_data[2], unpack_data[12])
-            print ("Time_ms", unpack_data[2])
-            print ("Accelerometer x", unpack_data[3]*488/1000/1000)
-            print ("Accelerometer y", unpack_data[4]*488/1000/1000)
-            print ("Accelerometer z", unpack_data[5]*488/1000/1000)
-            print ("Gyroscope x", unpack_data[6]*70/1000)
-            print ("Gyroscope y", unpack_data[7]*70/1000)
-            print ("Gyroscope z", unpack_data[8]*70/1000)
-            print ("Magnetometer x", unpack_data[9]/1711)
-            print ("Magnetometer y", unpack_data[10]/1711)
-            print ("Magnetometer z", unpack_data[11]/1711)
-            print ("Bme_temp", unpack_data[12])
-            print ("Bme_press", unpack_data[13])
-            print ("Bme_humidity", unpack_data[14])
-            print ("Bme_height", unpack_data[15])
-            print ("Lux_board", unpack_data[16])
-            print ("Lux_sp", unpack_data[17])
-            print ("State", unpack_data[18])
-            print ("Lidar", unpack_data[19])
-            print ("crc", unpack_data[20])
-            print ("\n")
-        elif len(data) == 53:
-            unpack_data = struct.unpack("<BHIh3fIf7HhIhH", data)
-            print ("Number", unpack_data[1])
-            print ("Time_ms", unpack_data[2])
-            print ("Fix", unpack_data[3])
-            print ("Lat", unpack_data[4])
-            print ("Lon", unpack_data[5])
-            print ("Alt", unpack_data[6])
-            print ("GPS_time_s", unpack_data[7])
-            print ("Current", unpack_data[8])
-            print ("Bus_voltage", unpack_data[9])
-            print ("MICS_5524", unpack_data[10])
-            print ("MICS_CO", unpack_data[11])
-            print ("MICS_NO2", unpack_data[12])
-            print ("MICS_NH3", unpack_data[13])
-            print ("CCS_CO2", unpack_data[14])
-            print ("CCS_TVOC", unpack_data[15])
-            print ("Bme_temp_g", unpack_data[16])
-            print ("Bme_press_g", unpack_data[17])
-            print ("Bme_humidity_g", unpack_data[18])
-            print ("crc", unpack_data[19])
-            print ('\n')
+    new_data_p1 = QtCore.Signal(list)
+    new_data_p2 = QtCore.Signal(list)
     def start(self):
-        host = '192.168.128.217'
+        host = '192.168.0.203'
         port = 22000
         addr = (host,port)
 
@@ -117,7 +57,7 @@ class DataManager(QtCore.QObject):
     def pars_packet(self, data):
         if len(data) == 50:
             unpack_data = struct.unpack("<BHI10hIh3fBhH", data)
-            self.new_data.emit(unpack_data)
+            self.new_data_p1.emit(unpack_data)
             print ("Time_ms", unpack_data[2])
             print ("Accelerometer x", unpack_data[3]*488/1000/1000)
             print ("Accelerometer y", unpack_data[4]*488/1000/1000)
@@ -140,6 +80,7 @@ class DataManager(QtCore.QObject):
             print ("\n")
         elif len(data) == 53:
             unpack_data = struct.unpack("<BHIh3fIf7HhIhH", data)
+            self.new_data_p2.emit(unpack_data)
             print ("Number", unpack_data[1])
             print ("Time_ms", unpack_data[2])
             print ("Fix", unpack_data[3])
@@ -162,6 +103,7 @@ class DataManager(QtCore.QObject):
             print ('\n')
         else:
             print("You are IDIOT!!!!!!!!!!!")
+
 
 
 class gcs(QMainWindow):
@@ -196,6 +138,9 @@ class gcs(QMainWindow):
         self.data_thread.started.connect(self.data_manager.start)
         self.data_thread.start()
 
+        self.data_manager.new_data_p1.connect(self.add_new_data_p1)
+        self.data_manager.new_data_p2.connect(self.add_new_data_p2)
+
 
 
     def load_ui(self):
@@ -215,7 +160,7 @@ class gcs(QMainWindow):
 
     def set_line(self, plot, coordinate_x, coordinate_y, color, name):
 
-        line = plot.plot(x=coordinate_x, y=coordinate_y, name=name)
+        line = plot.plot(x=[0], y=[0], name=name)
 
         pen = QtGui.QPen()
         pen.setColor(QtGui.QColor(color))
@@ -225,11 +170,17 @@ class gcs(QMainWindow):
 
     def add_data(self, plot, time, data):
         oldx, oldy = plot.getData()
-        newx = NumPy.hstack((oldx, time))
-        newy = NumPy.hstack((oldy, data))
+        if oldx[0] < 1:
+            print(oldx[0])
+            newx = NumPy.array(time)
+            newy = NumPy.array(data)
+        else:
+            newx = NumPy.hstack((oldx, time))
+            newy = NumPy.hstack((oldy, data))
+        if NumPy.size(newx) > 60:
+            newx = newx[NumPy.size(newx) -60:]
+            newy = newx[NumPy.size(newx) -60:]
         newdot = plot.setData(x=newx, y=newy)
-
-
 
     def setup_ui(self):
         self.set_axis(self.ui.Accelerometer, "Acceleration, g")
@@ -255,7 +206,7 @@ class gcs(QMainWindow):
         self.Accelerometer =       [self.set_line(self.ui.Accelerometer,       [0,1], [1,0],    "#0000FF", "x"),
                                     self.set_line(self.ui.Accelerometer,       [0,1], [0.5,0],  "#00FF00", "y"),
                                     self.set_line(self.ui.Accelerometer,       [0,1], [0.25,0], "#FF0000", "z")]
-        self.Giroscope =           [self.set_line(self.ui.Giroscope,           [0,1], [1,0],    "#0000FF", "x"),
+        self.Gyroscope =           [self.set_line(self.ui.Giroscope,           [0,1], [1,0],    "#0000FF", "x"),
                                     self.set_line(self.ui.Giroscope,           [0,1], [0.5,0],  "#00FF00", "y"),
                                     self.set_line(self.ui.Giroscope,           [0,1], [0.25,0], "#FF0000", "z")]
         self.Magnetometer =        [self.set_line(self.ui.Magnetometer,        [0,1], [1,0],    "#0000FF", "x"),
@@ -277,9 +228,39 @@ class gcs(QMainWindow):
                                     self.set_line(self.ui.SP_parameters,       [0,1], [0.5,0],  "#00FF00", "Voultage, V")]
         self.Illumination =        [self.set_line(self.ui.Illumination,        [0,1], [1,0],    "#0000FF", "SP"),
                                     self.set_line(self.ui.Illumination,        [0,1], [0.5,0],  "#00FF00", "Board")]
-        self.add_data(self.Gases_consentration[0], NumPy.array([5]), NumPy.array([5]))
+        #self.add_data(self.Accelerometer[0], [4, 6], [5, 8])
+        #self.add_data(self.Accelerometer[1], [4, 7], [5, 8])
+        #self.add_data(self.Accelerometer[2], [4, 8], [5, 8])
 
-
+    #@Slot(list)
+    def add_new_data_p1 (self, new_data_p1):
+        self.add_data(self.Accelerometer[0], [new_data_p1[2]], [new_data_p1[3]])
+        self.add_data(self.Accelerometer[1], [new_data_p1[2]], [new_data_p1[4]])
+        self.add_data(self.Accelerometer[2], [new_data_p1[2]], [new_data_p1[5]])
+        self.add_data(self.Gyroscope[0], [new_data_p1[2]], [new_data_p1[6]])
+        self.add_data(self.Gyroscope[1], [new_data_p1[2]], [new_data_p1[7]])
+        self.add_data(self.Gyroscope[2], [new_data_p1[2]], [new_data_p1[8]])
+        self.add_data(self.Magnetometer[0], [new_data_p1[2]], [new_data_p1[9]])
+        self.add_data(self.Magnetometer[1], [new_data_p1[2]], [new_data_p1[10]])
+        self.add_data(self.Magnetometer[2], [new_data_p1[2]], [new_data_p1[11]])
+        self.add_data(self.Pressure[0], [new_data_p1[2]], [new_data_p1[13]])
+        self.add_data(self.Height[0], [new_data_p1[2]], [new_data_p1[15]])
+        self.add_data(self.Temperature[0], [new_data_p1[2]], [new_data_p1[12]])
+        self.add_data(self.Illumination[0], [new_data_p1[2]], [new_data_p1[16]])
+        self.add_data(self.Illumination[1], [new_data_p1[2]], [new_data_p1[17]])
+    #@Slot(list)
+    def add_new_data_p2 (self, new_data_p2):
+        self.add_data(self.Height[1], [new_data_p2[2]], [new_data_p2[6]])
+        self.add_data(self.SP_parameters[0], [new_data_p2[2]], [new_data_p2[8]])
+        self.add_data(self.SP_parameters[1], [new_data_p2[2]], [new_data_p2[9]])
+        self.add_data(self.Gases_consentration[0], [new_data_p2[2]], [new_data_p2[10]])
+        self.add_data(self.Gases_consentration[1], [new_data_p2[2]], [new_data_p2[11]])
+        self.add_data(self.Gases_consentration[2], [new_data_p2[2]], [new_data_p2[12]])
+        self.add_data(self.Gases_consentration[3], [new_data_p2[2]], [new_data_p2[13]])
+        self.add_data(self.Gases_consentration[4], [new_data_p2[2]], [new_data_p2[14]])
+        self.add_data(self.Gases_consentration[5], [new_data_p2[2]], [new_data_p2[15]])
+        self.add_data(self.Pressure[1], [new_data_p2[2]], [new_data_p2[17]])
+        self.add_data(self.Temperature[1], [new_data_p2[2]], [new_data_p2[16]])
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -5,16 +5,18 @@ import time
 import datetime
 import argparse
 import sys
+import socket
+
 GPIO.cleanup()
 # настроить пины
-radio_M0 = 6
-radio_M1 = 5
+radio_M0 = 23
+radio_M1 = 24
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(radio_M0, GPIO.OUT)
 GPIO.setup(radio_M1, GPIO.OUT)
 
 # настроить порт UART
-port = "/dev/ttyUSB1"    #"COM1"
+port = "/dev/ttyUSB0"    #"COM1"
 baudrate = 9600
 timeout = 0.1
 ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
@@ -105,6 +107,14 @@ print(struct.unpack("<3BH7B", read_register[:12]))
 
 operating_mode(0)
 
+host = '0.0.0.0'
+port = 22000
+addr = (host,port)
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_socket.bind((host, port))
+conn, addr = udp_socket.recvfrom(1)
+print("Connect to ", addr)
+
 # читаем
 buf = bytes()
 flug_0 = 0xAA
@@ -127,6 +137,7 @@ while True:
                 if crc_cond == crc[0]:
                     print("==== Пакет тип 1 ====")
                     unpack_data = struct.unpack("<BHI10hIh3fBhH", buf[:50])
+                    udp_socket.sendto(buf[:50], addr)
                     print ("Number", unpack_data[1])
                     print ("Time_ms", unpack_data[2])
                     print ("Accelerometer x", unpack_data[3]*488/1000/1000)
@@ -185,6 +196,7 @@ while True:
                 if crc_cond == crc[0]:
                     print("==== Пакет тип 2 ====")
                     unpack_data = struct.unpack("<BHIh3fIf7HhIhH", buf[:53])
+                    udp_socket.sendto(buf[:53], addr)
                     print ("Number", unpack_data[1])
                     print ("Time_ms", unpack_data[2])
                     print ("Fix", unpack_data[3])
