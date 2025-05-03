@@ -30,7 +30,7 @@ class DataManager(QtCore.QObject):
 
 
     def start(self):
-        host = '192.168.120.217'
+        host = '192.168.0.203'
         port = 22000
         addr = (host,port)
 
@@ -39,18 +39,25 @@ class DataManager(QtCore.QObject):
         udp_socket.settimeout(0.1)
         udp_socket.sendto(b"h", addr)
         data = []
+        print("connected")
 
+        self.mutex.lock()
         self.close = True
+        close = self.close
+        self.mutex.unlock()
+
 
         while close:
             try:
                 data, addr = udp_socket.recvfrom(53)
             except Exception as e:
+                print(e)
                 pass
 
             try:
                 print(data)
             except Exception as e:
+                print(e)
                 pass
 
             try:
@@ -152,6 +159,9 @@ class gcs(QMainWindow):
         self.ui.Start.clicked.connect(self.start_action)
         self.ui.Reset.clicked.connect(self.reset_action)
 
+        self.data_manager.new_pack_1.connect(self.add_new_pack_1)
+        self.data_manager.new_pack_2.connect(self.add_new_pack_2)
+
 
     def load_ui(self):
         loader = UiLoader()
@@ -242,20 +252,20 @@ class gcs(QMainWindow):
 
     #@Slot(list)
     def add_new_pack_1(self, unpack_data):
-        self.add_data(self.Accelerometer[0], unpack_data[2], unpack_data[3]*488/1000/1000)
-        self.add_data(self.Accelerometer[1], unpack_data[2], unpack_data[4]*488/1000/1000)
-        self.add_data(self.Accelerometer[2], unpack_data[2], unpack_data[5]*488/1000/1000)
-        self.add_data(self.Giroscope[0], unpack_data[2], unpack_data[6]*70/1000)
-        self.add_data(self.Giroscope[1], unpack_data[2], unpack_data[7]*70/1000)
-        self.add_data(self.Giroscope[2], unpack_data[2], unpack_data[8]*70/1000)
-        self.add_data(self.Magnetometer[0], unpack_data[2], unpack_data[9]/1711)
-        self.add_data(self.Magnetometer[1], unpack_data[2], unpack_data[10]/1711)
-        self.add_data(self.Magnetometer[2], unpack_data[2], unpack_data[11]/1711)
-        self.add_data(self.Temperature[0], unpack_data[2], unpack_data[12])
-        self.add_data(self.Pressure[0], unpack_data[2], unpack_data[13])
-        self.add_data(self.Height[0], unpack_data[2], unpack_data[16])
-        self.add_data(self.Illumination[0], unpack_data[2], unpack_data[17])
-        self.add_data(self.Illumination[1], unpack_data[2], unpack_data[18])
+        self.add_data(self.Accelerometer[0], [unpack_data[2]], [unpack_data[3]*488/1000/1000])
+        self.add_data(self.Accelerometer[1], [unpack_data[2]], [unpack_data[4]*488/1000/1000])
+        self.add_data(self.Accelerometer[2], [unpack_data[2]], [unpack_data[5]*488/1000/1000])
+        self.add_data(self.Giroscope[0], [unpack_data[2]], [unpack_data[6]*70/1000])
+        self.add_data(self.Giroscope[1], [unpack_data[2]], [unpack_data[7]*70/1000])
+        self.add_data(self.Giroscope[2], [unpack_data[2]], [unpack_data[8]*70/1000])
+        self.add_data(self.Magnetometer[0], [unpack_data[2]], [unpack_data[9]/1711])
+        self.add_data(self.Magnetometer[1], [unpack_data[2]], [unpack_data[10]/1711])
+        self.add_data(self.Magnetometer[2], [unpack_data[2]], [unpack_data[11]/1711])
+        self.add_data(self.Temperature[0], [unpack_data[2]], [unpack_data[12]])
+        self.add_data(self.Pressure[0], [unpack_data[2]], [unpack_data[13]])
+        self.add_data(self.Height[0], [unpack_data[2]], [unpack_data[16]])
+        self.add_data(self.Illumination[0], [unpack_data[2]], [unpack_data[17]])
+        self.add_data(self.Illumination[1], [unpack_data[2]], [unpack_data[18]])
 
         self.ui.Packet1.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
         self.ui.Packet1.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
@@ -281,17 +291,17 @@ class gcs(QMainWindow):
 
     #@Slot(list)
     def add_new_pack_2(self, unpack_data):
-        self.add_data(self.Height[1], unpack_data[2], unpack_data[6])
-        self.add_data(self.SP_parameters[0], unpack_data[2], unpack_data[8])
-        self.add_data(self.SP_parameters[1], unpack_data[2], unpack_data[9])
-        self.add_data(self.Gases_consentration[0], unpack_data[2], unpack_data[10])
-        self.add_data(self.Gases_consentration[1], unpack_data[2], unpack_data[11])
-        self.add_data(self.Gases_consentration[2], unpack_data[2], unpack_data[12])
-        self.add_data(self.Gases_consentration[3], unpack_data[2], unpack_data[13])
-        self.add_data(self.Gases_consentration[4], unpack_data[2], unpack_data[14])
-        self.add_data(self.Gases_consentration[5], unpack_data[2], unpack_data[15])
-        self.add_data(self.Temperature[1], unpack_data[2], unpack_data[16])
-        self.add_data(self.Pressure[1], unpack_data[2], unpack_data[17])
+        self.add_data(self.Height[1], [unpack_data[2]], [unpack_data[6]])
+        self.add_data(self.SP_parameters[0], [unpack_data[2]], [unpack_data[8]])
+        self.add_data(self.SP_parameters[1], [unpack_data[2]], [unpack_data[9]])
+        self.add_data(self.Gases_consentration[0], [unpack_data[2]], [unpack_data[10]])
+        self.add_data(self.Gases_consentration[1], [unpack_data[2]], [unpack_data[11]])
+        self.add_data(self.Gases_consentration[2], [unpack_data[2]], [unpack_data[12]])
+        self.add_data(self.Gases_consentration[3], [unpack_data[2]], [unpack_data[13]])
+        self.add_data(self.Gases_consentration[4], [unpack_data[2]], [unpack_data[14]])
+        self.add_data(self.Gases_consentration[5], [unpack_data[2]], [unpack_data[15]])
+        self.add_data(self.Temperature[1], [unpack_data[2]], [unpack_data[16]])
+        self.add_data(self.Pressure[1], [unpack_data[2]], [unpack_data[17]])
 
         self.ui.Packet2.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
         self.ui.Packet2.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
