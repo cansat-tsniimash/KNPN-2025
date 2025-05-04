@@ -47,10 +47,10 @@ void lisset(stmdev_ctx_t *ctx, struct lis_spi_intf *spi_interface)
 	ctx->read_reg = lis3mdl_read;
 	ctx->write_reg = lis3mdl_write;
 
+
 	// Это придется делать прямо сразу еще до всего
 	// так как иначе он с ним общаться не сможет (судя по доке по-крайней мере)
 	lis3mdl_spi_mode_set(ctx, LIS3MDL_SPI_3_WIRE);
-
 	uint8_t whoami_mag = 0x00;
 	lis3mdl_device_id_get(ctx, &whoami_mag);
 

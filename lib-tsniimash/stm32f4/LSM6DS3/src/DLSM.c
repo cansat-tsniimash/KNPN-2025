@@ -84,6 +84,7 @@ void lsmset(stmdev_ctx_t *ctx, struct lsm_spi_intf *spi_interface)
 		ctx->read_reg = lsm6ds3_read;
 		ctx->write_reg = lsmd6s3_write;
 
+
 		uint8_t whoami = 0x00;
 		lsm6ds3_device_id_get(ctx, &whoami);
 

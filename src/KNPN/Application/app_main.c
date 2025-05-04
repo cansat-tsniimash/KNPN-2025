@@ -110,7 +110,7 @@ static ad5593_t adc;
 static int setup_adc()
 {
 	ad5593_t * dev = &adc;
-	int rc = ad5593_ctor(dev, AD5593_ADDR_A0_HIGH, &hi2c1);
+	int rc = ad5593_ctor(dev, AD5593_ADDR_A0_LOW, &hi2c1);
 	if (0 != rc)
 	{
 		perror("unable to ctor");
@@ -338,7 +338,7 @@ int app_main(){
 	HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
 */
 
-	//test_adc();
+	test_adc();
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
@@ -369,14 +369,14 @@ int app_main(){
 			f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
 			f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND); // открытие файла
 		}
-
+/*
 		its_bme280_read(UNKNOWN_BME, &bme_shit);
 		bmp_temp = bme_shit.temperature;
 		bmp_press = bme_shit.pressure;
 		bmp_humidity = bme_shit.humidity;
 		double ground_pressure = bme_shit.pressure;
 		height = 44330 * (1 - pow(bmp_press / ground_pressure, 1.0 / 5.255));
-
+*/
 		lsmread(&ctx_lsm, &temperature_celsius_gyro, &acc_g, &gyro_dps);
 		lisread(&ctx_lis, &temperature_celsius_mag, &mag);
 
@@ -397,13 +397,13 @@ int app_main(){
 		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
 
 
-		CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
+		//CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
 
-		if (CCS811_DataAvailable())
-	    {
-		    CCS811_ReadAlgorithmResults(&co2, &tvoc);
-	    }
-		num1 += 1;
+		//if (CCS811_DataAvailable())
+	  //  {
+		//    CCS811_ReadAlgorithmResults(&co2, &tvoc);
+	  //  }
+		//num1 += 1;
 
 		pack1.num = num1;
 		pack1.time_ms = HAL_GetTick();
