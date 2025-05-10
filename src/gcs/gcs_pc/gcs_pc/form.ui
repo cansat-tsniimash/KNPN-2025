@@ -127,7 +127,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="tableWidget_2">
+       <widget class="QTableWidget" name="Packet1">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -162,7 +162,7 @@
          <bool>true</bool>
         </property>
         <property name="rowCount">
-         <number>18</number>
+         <number>19</number>
         </property>
         <property name="columnCount">
          <number>2</number>
@@ -218,11 +218,12 @@
         <row/>
         <row/>
         <row/>
+        <row/>
         <column/>
         <column/>
         <item row="0" column="0">
          <property name="text">
-          <string>Numer</string>
+          <string>Number</string>
          </property>
         </item>
         <item row="0" column="1">
@@ -332,7 +333,7 @@
         </item>
         <item row="11" column="0">
          <property name="text">
-          <string>State</string>
+          <string>Temperature</string>
          </property>
         </item>
         <item row="11" column="1">
@@ -342,7 +343,7 @@
         </item>
         <item row="12" column="0">
          <property name="text">
-          <string>Illumination</string>
+          <string>Pressure</string>
          </property>
         </item>
         <item row="12" column="1">
@@ -352,7 +353,7 @@
         </item>
         <item row="13" column="0">
          <property name="text">
-          <string>Distance</string>
+          <string>Humidity</string>
          </property>
         </item>
         <item row="13" column="1">
@@ -362,7 +363,7 @@
         </item>
         <item row="14" column="0">
          <property name="text">
-          <string>Temperature</string>
+          <string>Height</string>
          </property>
         </item>
         <item row="14" column="1">
@@ -372,7 +373,7 @@
         </item>
         <item row="15" column="0">
          <property name="text">
-          <string>Height</string>
+          <string>Illumination board</string>
          </property>
         </item>
         <item row="15" column="1">
@@ -382,7 +383,7 @@
         </item>
         <item row="16" column="0">
          <property name="text">
-          <string>Humidity</string>
+          <string>Illumination SP</string>
          </property>
         </item>
         <item row="16" column="1">
@@ -392,10 +393,20 @@
         </item>
         <item row="17" column="0">
          <property name="text">
-          <string>Pressure</string>
+          <string>State</string>
          </property>
         </item>
         <item row="17" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="18" column="0">
+         <property name="text">
+          <string>Lidar</string>
+         </property>
+        </item>
+        <item row="18" column="1">
          <property name="text">
           <string>0</string>
          </property>
@@ -413,7 +424,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QTableWidget" name="Packet2">
         <property name="maximumSize">
          <size>
           <width>245</width>
@@ -421,7 +432,7 @@
          </size>
         </property>
         <property name="rowCount">
-         <number>16</number>
+         <number>18</number>
         </property>
         <property name="columnCount">
          <number>2</number>
@@ -463,11 +474,13 @@
         <row/>
         <row/>
         <row/>
+        <row/>
+        <row/>
         <column/>
         <column/>
         <item row="0" column="0">
          <property name="text">
-          <string>Latitute</string>
+          <string>Number</string>
          </property>
         </item>
         <item row="0" column="1">
@@ -477,7 +490,7 @@
         </item>
         <item row="1" column="0">
          <property name="text">
-          <string>Longitute</string>
+          <string>Time</string>
          </property>
         </item>
         <item row="1" column="1">
@@ -487,7 +500,7 @@
         </item>
         <item row="2" column="0">
          <property name="text">
-          <string>Height GPS</string>
+          <string>Fix GPS</string>
          </property>
         </item>
         <item row="2" column="1">
@@ -497,7 +510,7 @@
         </item>
         <item row="3" column="0">
          <property name="text">
-          <string>Fix</string>
+          <string>Latitute</string>
          </property>
         </item>
         <item row="3" column="1">
@@ -507,7 +520,7 @@
         </item>
         <item row="4" column="0">
          <property name="text">
-          <string>Time GPS</string>
+          <string>Longiture</string>
          </property>
         </item>
         <item row="4" column="1">
@@ -517,7 +530,7 @@
         </item>
         <item row="5" column="0">
          <property name="text">
-          <string>MICS-6814 CO</string>
+          <string>Hight GPS</string>
          </property>
         </item>
         <item row="5" column="1">
@@ -527,7 +540,7 @@
         </item>
         <item row="6" column="0">
          <property name="text">
-          <string>MICS-6814 NO2</string>
+          <string>Time GPS</string>
          </property>
         </item>
         <item row="6" column="1">
@@ -537,7 +550,7 @@
         </item>
         <item row="7" column="0">
          <property name="text">
-          <string>MICS-6814 NH3</string>
+          <string>Current SP</string>
          </property>
         </item>
         <item row="7" column="1">
@@ -547,7 +560,7 @@
         </item>
         <item row="8" column="0">
          <property name="text">
-          <string>MICS-5524</string>
+          <string>Voltage SP</string>
          </property>
         </item>
         <item row="8" column="1">
@@ -557,7 +570,7 @@
         </item>
         <item row="9" column="0">
          <property name="text">
-          <string>CCS811 CO2</string>
+          <string>MICS 5524</string>
          </property>
         </item>
         <item row="9" column="1">
@@ -567,7 +580,7 @@
         </item>
         <item row="10" column="0">
          <property name="text">
-          <string>CCS811 TVOC</string>
+          <string>MICS CO</string>
          </property>
         </item>
         <item row="10" column="1">
@@ -577,7 +590,7 @@
         </item>
         <item row="11" column="0">
          <property name="text">
-          <string>Temperature germo</string>
+          <string>MICS NO2</string>
          </property>
         </item>
         <item row="11" column="1">
@@ -587,7 +600,7 @@
         </item>
         <item row="12" column="0">
          <property name="text">
-          <string>Pressure germo</string>
+          <string>MICS NH3</string>
          </property>
         </item>
         <item row="12" column="1">
@@ -597,7 +610,7 @@
         </item>
         <item row="13" column="0">
          <property name="text">
-          <string>Humidity germo</string>
+          <string>CCS CO2</string>
          </property>
         </item>
         <item row="13" column="1">
@@ -607,7 +620,7 @@
         </item>
         <item row="14" column="0">
          <property name="text">
-          <string>SP current</string>
+          <string>CCS TVOC</string>
          </property>
         </item>
         <item row="14" column="1">
@@ -617,12 +630,22 @@
         </item>
         <item row="15" column="0">
          <property name="text">
-          <string>SP voltage</string>
+          <string>Temperature G</string>
          </property>
         </item>
         <item row="15" column="1">
          <property name="text">
           <string>0</string>
+         </property>
+        </item>
+        <item row="16" column="0">
+         <property name="text">
+          <string>Pressure G</string>
+         </property>
+        </item>
+        <item row="17" column="0">
+         <property name="text">
+          <string>Humidity G</string>
          </property>
         </item>
        </widget>

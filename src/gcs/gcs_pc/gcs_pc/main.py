@@ -30,7 +30,7 @@ class DataManager(QtCore.QObject):
 
 
     def start(self):
-        host = '192.168.0.203'
+        host = '192.168.73.217'
         port = 22000
         addr = (host,port)
 
@@ -191,15 +191,21 @@ class gcs(QMainWindow):
     def add_data(self, plot, time, data):
         oldx, oldy = plot.getData()
         if oldx[0] < 1:
-            print(oldx[0])
             newx = NumPy.array(time)
             newy = NumPy.array(data)
         else:
             newx = NumPy.hstack((oldx, time))
             newy = NumPy.hstack((oldy, data))
-        if NumPy.size(newx) > 60:
-            newx = newx[NumPy.size(newx) -60:]
-            newy = newx[NumPy.size(newx) -60:]
+        if NumPy.size(newx) > 50:
+            newx = newx[-50:]
+            newy = newy[-50:]
+
+        current_len_x = NumPy.size(newx)
+        current_len_y = NumPy.size(newy)
+        if current_len_x != current_len_y:
+            final_len = min(current_len_x, current_len_y)
+            newx = newx[:final_len]
+            newy = newy[:final_len]
         newdot = plot.setData(x=newx, y=newy)
 
     def setup_ui(self):
@@ -329,15 +335,17 @@ class gcs(QMainWindow):
         self.data_manager.stop()
 
     def reset_action(self):
-        self.ui.clear_all(self.Accelerometer)
-        self.ui.clear_all(self.Giroscope)
-        self.ui.clear_all(self.Magnetometer)
-        self.ui.clear_all(self.Pressure)
-        self.ui.clear_all(self.Height)
-        self.ui.clear_all(self.Temperature)
-        self.ui.clear_all(self.Gases_consentration)
-        self.ui.clear_all(self.SP_parameters)
-        self.ui.clear_all(self.Illumination)
+        all_plot_item_lists = [
+            self.Accelerometer, self.Giroscope, self.Magnetometer,
+            self.Pressure, self.Height, self.Temperature,
+            self.Gases_consentration, self.SP_parameters, self.Illumination
+        ]
+        for plot_item_list in all_plot_item_lists:
+            if plot_item_list: # Check if the list itself is not None or empty
+                for item in plot_item_list: # item is a PlotDataItem
+                    if item: # Check if item is not None
+                        # Reset to the initial (0,0) state to match how set_line initializes them
+                        item.setData(x=[0], y=[0])
 
 if __name__ == "__main__":
     app = QApplication([])
