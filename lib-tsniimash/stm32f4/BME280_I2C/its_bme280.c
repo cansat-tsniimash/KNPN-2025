@@ -38,13 +38,13 @@ static int8_t _i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t l
 static void _delay_ms(uint32_t ms);
 
 
-static its_bme280_t _devices[1] = {
+static its_bme280_t _devices[2] = {
 	{
 		.addr = BME280_I2C_ADDR_PRIM,
 		.bus = &hi2c1,
 		.driver =
 		{
-			.dev_id = UNKNOWN_BME,
+			.dev_id = UNKNOWN_BME1,
 			.intf = BME280_I2C_INTF,
 			.read = _i2c_read,
 			.write = _i2c_write,
@@ -58,13 +58,33 @@ static its_bme280_t _devices[1] = {
 					.standby_time = BME280_STANDBY_TIME_500_MS
 			}
 		}
-	}
+	},
+	{
+			.addr = BME280_I2C_ADDR_SEC,
+			.bus = &hi2c1,
+			.driver =
+			{
+				.dev_id = UNKNOWN_BME2,
+				.intf = BME280_I2C_INTF,
+				.read = _i2c_read,
+				.write = _i2c_write,
+				.delay_ms = _delay_ms,
+				.settings =
+				{
+						.filter = BME280_FILTER_COEFF_OFF,
+						.osr_h = BME280_OVERSAMPLING_16X,
+						.osr_p = BME280_OVERSAMPLING_16X,
+						.osr_t = BME280_OVERSAMPLING_16X,
+						.standby_time = BME280_STANDBY_TIME_500_MS
+				}
+			}
+		}
 };
 
 
 static its_bme280_t * _dev_by_id(its_bme280_id_t id)
 {
-	assert(id >= 0 && id < 1);
+	assert(id >= 0 && id <= 1);
 	its_bme280_t * const dev = &_devices[id];
 
 	return dev;

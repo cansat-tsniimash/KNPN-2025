@@ -10,7 +10,8 @@
 
 typedef enum its_bme280_id_t
 {
-	UNKNOWN_BME = 0,
+	UNKNOWN_BME1 = 0,
+	UNKNOWN_BME2 = 1,
 } its_bme280_id_t;
 
 

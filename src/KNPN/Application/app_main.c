@@ -27,6 +27,7 @@
 #include <fatfs.h>
 #include "AD5593/ad5593.h"
 #include "CCS811.h"
+#include "cyclebuffer.h"
 
 extern SPI_HandleTypeDef hspi1;
 //extern SPI_HandleTypeDef hspi4;
@@ -72,6 +73,8 @@ FIL File_b; // хендлер файла
 const char path1[] = "packet1.csv\0";
 const char path2[] = "packet2.csv\0";
 const char pathb[] = "packetb.bin\0";
+
+cbuffer_t lidar_buff;
 
 FRESULT is_mount = 0;
 int needs_mount = 0;
@@ -183,8 +186,13 @@ static void test_adc()
 		ad5593_adc_read(dev, channel_3, &R_MICS_CO);
 		ad5593_adc_read(dev, channel_4, &R_MICS_NO2);
 		ad5593_adc_read(dev, channel_2, &R_MICS_NH3);
-		ad5593_adc_read(dev, channel_1, (uint16_t*)&foto_sp);
-		ad5593_adc_read(dev, channel_0, (uint16_t*)&foto_state);
+
+		uint16_t foto_sp_raw;
+		uint16_t foto_state_raw;
+		ad5593_adc_read(dev, channel_1, &foto_sp_raw);
+		ad5593_adc_read(dev, channel_0, &foto_state_raw);
+		foto_sp = foto_sp_raw;
+		foto_state = foto_state_raw;
 
 		float volts_sp = foto_sp * 3.3 / 4095;  //Volts
 		float ohms_sp = volts_sp*(3300)/(3.3-volts_sp);    //Ohms
@@ -199,14 +207,135 @@ static void test_adc()
 
 }
 
+extern shift_reg_t shift_reg_r;
 
+// Состояния алгоритма наведения солнечной панели
+typedef enum {
+    IDLE,               // Ожидание старта
+    HORIZ_90_START,     // Начало поворота по горизонтали на 90°
+    HORIZ_90_WAIT,      // Ожидание завершения поворота на 90°
+    VERT_SCAN_START,    // Начало вертикального сканирования
+    VERT_SCAN_WAIT,     // Ожидание завершения вертикального сканирования и поиск макс. освещённости
+    VERT_SCAN_BACK,     // Возврат в точку макс. освещённости по вертикали
+    HORIZ_SCAN_START,   // Начало горизонтального сканирования
+    HORIZ_SCAN_WAIT,    // Ожидание завершения горизонтального сканирования и поиск макс. освещённости
+    HORIZ_SCAN_BACK,    // Возврат в точку макс. освещённости по горизонтали
+    COMPLETE            // Процесс завершён
+} SunTrackState;
+
+// Текущее состояние FSM
+SunTrackState state = IDLE;
+
+// Время начала текущего состояния
+uint32_t state_start_time = 0;
+// Время (в пределах шага), когда был зафиксирован максимум света
+uint32_t max_light_time = 0;
+// Значение максимальной освещённости, обнаруженной фоторезистором
+uint16_t max_light_value = 0;
+
+// Главная функция FSM для запуска процесса наведения
+void SunTrack_Run(void) {
+    uint32_t now = HAL_GetTick(); // Получаем текущее время
+
+    switch (state) {
+
+        case IDLE:
+            // Начинаем процесс наведения
+            state = HORIZ_90_START;
+            break;
+
+        case HORIZ_90_START:
+            shift_reg_write_bit_8(&shift_reg_r, 3, 1); // Вращаем по горизонтали вперёд
+            state_start_time = now;
+            state = HORIZ_90_WAIT;
+            break;
+
+        case HORIZ_90_WAIT:
+            if (now - state_start_time >= 1000) { // Ожидаем 1 секунду (90°)
+                shift_reg_write_bit_8(&shift_reg_r, 3, 0); // Останавливаем мотор
+                state = VERT_SCAN_START;
+            }
+            break;
+
+        case VERT_SCAN_START:
+            shift_reg_write_bit_8(&shift_reg_r, 1, 1); // Вращаем по вертикали вперёд
+            state_start_time = now;
+            max_light_value = 0;
+            max_light_time = 0;
+            state = VERT_SCAN_WAIT;
+            break;
+
+        case VERT_SCAN_WAIT:
+            // Обновляем максимум, если текущее значение выше
+            if (foto_sp > max_light_value) {
+                max_light_value = foto_sp;
+                max_light_time = now - state_start_time;
+            }
+            // Если прошло 6 секунд — полный оборот
+            if (now - state_start_time >= 6000) {
+                shift_reg_write_bit_8(&shift_reg_r, 1, 0);
+                state_start_time = now;
+                shift_reg_write_bit_8(&shift_reg_r, 2, 1); // Вращаем обратно
+                state = VERT_SCAN_BACK;
+            }
+            break;
+
+        case VERT_SCAN_BACK:
+            // Ждём столько, сколько потребовалось, чтобы найти максимум
+            if (now - state_start_time >= max_light_time) {
+                shift_reg_write_bit_8(&shift_reg_r, 2, 0);
+                state = HORIZ_SCAN_START;
+            }
+            break;
+
+        case HORIZ_SCAN_START:
+            shift_reg_write_bit_8(&shift_reg_r, 3, 1); // Вращаем по горизонтали вперёд
+            state_start_time = now;
+            max_light_value = 0;
+            max_light_time = 0;
+            state = HORIZ_SCAN_WAIT;
+            break;
+
+        case HORIZ_SCAN_WAIT:
+            if (foto_sp > max_light_value) {
+                max_light_value = foto_sp;
+                max_light_time = now - state_start_time;
+            }
+            if (now - state_start_time >= 4000) { // Полный оборот по горизонтали
+                shift_reg_write_bit_8(&shift_reg_r, 3, 0);
+                state_start_time = now;
+                shift_reg_write_bit_8(&shift_reg_r, 4, 1); // Вращаем обратно
+                state = HORIZ_SCAN_BACK;
+            }
+            break;
+
+        case HORIZ_SCAN_BACK:
+            if (now - state_start_time >= max_light_time) {
+                shift_reg_write_bit_8(&shift_reg_r, 4, 0);
+                state = COMPLETE;
+            }
+            break;
+
+        case COMPLETE:
+
+            break;
+    }
+}
+
+void accept_lidar_byte(uint8_t byte){
+	sbuffer_push(&lidar_buff, byte);
+}
 
 int app_main(){
 
+	uint32_t start;
+	uint32_t stop;
 //файлы
 	UINT Bytes = 0;
 
 	memset(&fileSystem, 0x00, sizeof(fileSystem));
+
+	sbuffer_init(&lidar_buff);
 
 	extern Disk_drvTypeDef disk;
 	disk.is_initialized[0] = 0;
@@ -216,14 +345,14 @@ int app_main(){
 		res1csv = f_open(&File_1csv, (char*)path1, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res1csv != FR_OK;
 
-		int res1csv2 = f_puts("num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar\n", &File_1csv);
+		int res1csv2 = f_puts("flag; num; time_ms; accl1; accl2; accl3; gyro1; gyro2; gyro3; mag1; mag2; mag3; bme_temp; bme_press; bme_humidity; bme_height; lux_board; lux_sp; state; lidar; crc\n", &File_1csv);
 		res1csv = f_sync(&File_1csv);
 		needs_mount = needs_mount || res1csv != FR_OK;
 	}
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
 		res2csv = f_open(&File_2csv, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res2csv != FR_OK;
-		int res2csv2 = f_puts("num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g\n", &File_2csv);
+		int res2csv2 = f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
 		res2csv = f_sync(&File_2csv);
 		needs_mount = needs_mount || res2csv != FR_OK;
 	}
@@ -253,15 +382,11 @@ int app_main(){
 	float lat;
 	float lon;
 	float alt;
-	float lats;
-	float lons;
-	float alts;
 	int64_t cookie;
 	int fix;
 	uint64_t gps_time_s;
 	uint32_t gps_time_us;
-	uint16_t num1 = 0 ;
-	uint16_t num2 = 0 ;
+
 
 //сдвиговый регистр
 	shift_reg_t shift_reg_r;
@@ -296,9 +421,10 @@ int app_main(){
 
 	//bme280
 	bme_important_shit_t bme_shit;
-	its_bme280_init(UNKNOWN_BME);
+	its_bme280_init(UNKNOWN_BME1);
 
-
+	bme_important_shit_t bme2_shit;
+	its_bme280_init(UNKNOWN_BME2);
 
 	// Инициализация ad5593
 	setup_adc();
@@ -309,11 +435,15 @@ int app_main(){
 
 	pack1_t pack1 = {0};
 	pack2_t pack2 = {0};
+
 	gps_init();
 	gps_work();
 
 	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 	__HAL_UART_ENABLE_IT(&huart2, UART_IT_ERR);
+
+	__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(&huart6, UART_IT_ERR);
 
 	int a = 0;
 
@@ -321,29 +451,37 @@ int app_main(){
 
 
 
-	uint8_t settings_datarate[] = {0xC0, 0x02, 0x01, 0x62};
-	uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x17};
+	//uint8_t settings_uartrate[] = {0xC0, 0x02, 0x01, 0x62};
+	//uint8_t settings_speed[] = {0xC0, 0x02, 0x01, 0x65};
+	//uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x17};
+	uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x28};
+	uint8_t settings_speed_uartrate[] = {0xC0, 0x02, 0x01, 0xA5};
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, SET);
 
-	HAL_UART_Transmit(&huart1, settings_datarate, sizeof(settings_datarate), HAL_MAX_DELAY);
-	HAL_Delay(1000);
+	uint8_t channel_answer[2] = {0};
 	HAL_UART_Transmit(&huart1, settings_channel, sizeof(settings_channel), HAL_MAX_DELAY);
+	//HAL_UART_Receive(&huart1, channel_answer,  sizeof(channel_answer), HAL_MAX_DELAY);
+	HAL_Delay(1000);
+	HAL_UART_Transmit(&huart1, settings_speed_uartrate, sizeof(settings_speed_uartrate), HAL_MAX_DELAY);
+	HAL_Delay(1000);
 
-/*
+
+
 	uint8_t settings1[] = {0xC1, 0x00, 0x08};
 	uint8_t result[11] = {0};
 	HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), HAL_MAX_DELAY);
 	HAL_UART_Receive(&huart1, result,  sizeof(result), HAL_MAX_DELAY);
-*/
+
 
 	test_adc();
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
 
-
+	huart1.Init.BaudRate = 38400;
+	HAL_UART_Init(&huart1);
 
 	uint16_t co2, tvoc;
 
@@ -351,6 +489,14 @@ int app_main(){
 
 	while(1){
 
+		if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)){
+			shift_reg_write_bit_8(&shift_reg_r, 0, 1);
+		}
+		else{
+			shift_reg_write_bit_8(&shift_reg_r, 0, 0);
+		}
+
+		start = HAL_GetTick();
 
 
 
@@ -369,14 +515,16 @@ int app_main(){
 			f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
 			f_open(&File_b, pathb, FA_WRITE | FA_OPEN_APPEND); // открытие файла
 		}
-/*
-		its_bme280_read(UNKNOWN_BME, &bme_shit);
+
+		its_bme280_read(UNKNOWN_BME1, &bme_shit);
+		its_bme280_read(UNKNOWN_BME2, &bme2_shit);
 		bmp_temp = bme_shit.temperature;
 		bmp_press = bme_shit.pressure;
 		bmp_humidity = bme_shit.humidity;
 		double ground_pressure = bme_shit.pressure;
 		height = 44330 * (1 - pow(bmp_press / ground_pressure, 1.0 / 5.255));
-*/
+
+
 		lsmread(&ctx_lsm, &temperature_celsius_gyro, &acc_g, &gyro_dps);
 		lisread(&ctx_lis, &temperature_celsius_mag, &mag);
 
@@ -397,64 +545,27 @@ int app_main(){
 		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
 
 
-		//CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
+		CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
 
-		//if (CCS811_DataAvailable())
-	  //  {
-		//    CCS811_ReadAlgorithmResults(&co2, &tvoc);
-	  //  }
-		//num1 += 1;
-
-		pack1.num = num1;
-		pack1.time_ms = HAL_GetTick();
-		pack1.flag = 0xAA;
-		pack1.bme_height = height;
-		pack1.bme_humidity = bmp_humidity;
-		pack1.bme_press = bmp_press;
-		pack1.bme_temp = bmp_temp;
-		pack1.lidar = 666;
-		pack1.lux_board = foto_state;
-		pack1.lux_sp = foto_sp;
-		pack1.state = 0;
-		pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
-
-		num2 += 1;
-
-		pack2.num = num2;
-		pack2.time_ms = HAL_GetTick();
-		pack2.flag = 0xBB;
-		pack2.MICS_CO = R_MICS_CO;
-		pack2.MICS_NH3 = R_MICS_NH3;
-		pack2.MICS_NO2 = R_MICS_NO2;
-		pack2.MICS_5524 = R_MICS_5524;
-		pack2.CCS_TVOC = 666;
-		pack2.CCS_CO2 = 666;
-		pack2.lat = 666;
-		pack2.lon = 666;
-		pack2.alt = 666;
-		pack2.gps_time_s = 666;
-		pack2.fix = 666;
-		pack2.bme_humidity_g = 666;
-		pack2.bme_press_g = 666;
-		pack2.bme_temp_g = 666;
-		pack2.bus_voltage = 666;
-		pack2.current = 666;
-		pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
-
-
-
-		int size_pack1 = sizeof(pack1);
-		int size_pack2 = sizeof(pack2);
+		if (CCS811_DataAvailable())
+		{
+		    CCS811_ReadAlgorithmResults(&co2, &tvoc);
+	    }
 
 		HAL_StatusTypeDef tr;
 
-		HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
-		HAL_Delay(100);
-		HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
-		HAL_Delay(100);
-
 		uint8_t lidar[18];
-		HAL_UART_Receive(&huart6, lidar, 18, 100);
+		size_t lidar_data_size = 0;
+		//HAL_UART_Receive(&huart6, lidar, 18, 100);
+		for (int i = 0; i < 18; i++)
+		{
+			int value = sbuffer_pop(&lidar_buff);
+			if (value < 0)
+				break;
+
+			lidar[i] = value;
+			lidar_data_size++;
+		}
 
 		for(int i = 0; i < 9; i++){
 			if ((lidar[0] != 0x59) || (lidar[1] != 0x59)){
@@ -469,64 +580,112 @@ int app_main(){
 		//uint16_t crc_lidar = lidar[0] + lidar[0] + lidar[1] + lidar[0] + lidar[1] + lidar[2] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[7];
 		//uint16_t crc_lidar_8 = crc_lidar & 0x00FF;
 
+		pack1.flag = 0xAA;
+		pack1.bme_height = height;
+		pack1.bme_humidity = bmp_humidity;
+		pack1.bme_press = bmp_press;
+		pack1.bme_temp = bmp_temp;
+		pack1.lidar = lidar_1;
+		pack1.lux_board = foto_state;
+		pack1.lux_sp = foto_sp;
+		pack1.state = 0;
+		pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+
+
+		pack2.flag = 0xBB;
+		pack2.MICS_CO = R_MICS_CO;
+		pack2.MICS_NH3 = R_MICS_NH3;
+		pack2.MICS_NO2 = R_MICS_NO2;
+		pack2.MICS_5524 = R_MICS_5524;
+		pack2.CCS_TVOC = tvoc;
+		pack2.CCS_CO2 = co2;
+		pack2.lat = lat;
+		pack2.lon = lon;
+		pack2.alt = alt;
+		pack2.gps_time_s = gps_time_s;
+		pack2.fix = fix;
+		pack2.bme_humidity_g = bme2_shit.humidity;
+		pack2.bme_press_g = bme2_shit.pressure;
+		pack2.bme_temp_g = bme2_shit.temperature;
+		pack2.bus_voltage = 666;
+		pack2.current = 666;
+
+
+		int size_pack1 = sizeof(pack1);
+		int size_pack2 = sizeof(pack2);
 
 
 		switch(sd_state) {
 			case SD_PACK_1:
-
-
 				if (res1csv == FR_OK){
 					num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
 
 					res1csv = f_write(&File_1csv,str_buf,num_written, &Bytes); // отправка на запись в файл
-					res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					if (pack1.num % 50 == 0)
+						res1csv = f_sync(&File_1csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 				}
 				if (resb == FR_OK){
 					resb = f_write(&File_b,(uint8_t *)&pack1,sizeof(pack1), &Bytes); // отправка на запись в файл
-					resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					if (pack1.num % 50 == 0)
+						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+				}
+				pack1.num++;
+				pack1.time_ms = HAL_GetTick();
+				pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+
+				if(	HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
+					HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), HAL_MAX_DELAY);
+					HAL_Delay(10);
 				}
 			a++;
-			sd_state = SD_WAIT;
+			if(a == 4)
+				sd_state = SD_PACK_2;
+			else
+				sd_state = SD_PACK_1;
+
 			break;
 
 			case SD_PACK_2:
-
-
 				if (res2csv == FR_OK){
 					num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
 
 					res2csv = f_write(&File_2csv,str_buf,num_written, &Bytes); // отправка на запись в файл
-					res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					if (pack2.num % 50 == 0)
+						res2csv = f_sync(&File_2csv); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 				}
 				if (resb == FR_OK){
 					resb = f_write(&File_b,(uint8_t *)&pack2,sizeof(pack2), &Bytes); // отправка на запись в файл
-					resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
+					if (pack2.num % 50 == 0)
+						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 				}
 
-				sd_state = SD_WAIT;
-				a=0;
-			break;
+				pack2.num++;
+				pack2.time_ms = HAL_GetTick();
+				pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 
-			case SD_WAIT:
+				if(	HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
+					HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), HAL_MAX_DELAY);
+					HAL_Delay(10);
+				}
+				else{
+					volatile int x = 0;
+				}
+
 				if(a == 4)
 					sd_state = SD_PACK_2;
 				else
 					sd_state = SD_PACK_1;
-
+				a=0;
 			break;
+		}
 
-
-
-
-
-
-
+		stop = HAL_GetTick();
+		uint32_t delta = stop - start;
+		printf("delta = %u\n", delta);
 	}
 
-			//nrf24_fifo_write(&nrf24, (uint8_t *)&pack1, sizeof(pack1), false);
-			//nrf24_irq_get(&nrf24,&a);
-			//nrf24_fifo_flush_tx(&nrf24);
-	}
 	return 0;
 }
+
+
 

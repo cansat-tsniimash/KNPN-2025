@@ -27,6 +27,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
 int app_main();
 /* USER CODE END PTD */
 
