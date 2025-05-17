@@ -8,7 +8,7 @@ import struct
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 from PySide2 import QtUiTools, QtGui, QtCore
-
+from PySide2.QtGui import QFont
 #from PyQt5 import QtWidgets, uic, QtCore
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
@@ -30,7 +30,7 @@ class DataManager(QtCore.QObject):
 
 
     def start(self):
-        host = '192.168.73.217'
+        host = '192.168.0.203'
         port = 22000
         addr = (host,port)
 
@@ -174,8 +174,13 @@ class gcs(QMainWindow):
     def set_axis(self, plot, name):
         axis_x = pg.AxisItem(orientation='bottom')
         axis_x.setLabel("Time")
+        my_font = QFont("Times", 14, QFont.Bold)
+        axis_x.label.setFont(my_font)
+        axis_x.setStyle(tickFont=my_font)
         axis_y = pg.AxisItem(orientation='left')
         axis_y.setLabel(name)
+        axis_y.label.setFont(my_font)
+        axis_y.setStyle(tickFont=my_font)
         plot.setAxisItems({'bottom': axis_x, 'left': axis_y})
 
     def set_line(self, plot, color, name):
@@ -196,9 +201,9 @@ class gcs(QMainWindow):
         else:
             newx = NumPy.hstack((oldx, time))
             newy = NumPy.hstack((oldy, data))
-        if NumPy.size(newx) > 50:
-            newx = newx[-50:]
-            newy = newy[-50:]
+        if NumPy.size(newx) > 100:
+            newx = newx[-100:]
+            newy = newy[-100:]
 
         current_len_x = NumPy.size(newx)
         current_len_y = NumPy.size(newy)
@@ -212,7 +217,7 @@ class gcs(QMainWindow):
         self.set_axis(self.ui.Accelerometer, "Acceleration, g")
         self.set_axis(self.ui.Giroscope, "Angular rate, m/s")
         self.set_axis(self.ui.Magnetometer, "Magnetic induction, gauss")
-        self.set_axis(self.ui.Pressure, "Pressure, J")
+        self.set_axis(self.ui.Pressure, "Pressure, Pa")
         self.set_axis(self.ui.Height, "Height, m")
         self.set_axis(self.ui.Temperature, "Temperature, C")
         self.set_axis(self.ui.Gases_consentration, "Gases consentration, ppm")
