@@ -211,7 +211,7 @@ void USART2_IRQHandler(void)
 	volatile uint32_t sr = huart2.Instance->SR;
 		//#pragma GCC diagnostic pop
 	volatile uint32_t byte = huart2.Instance->DR;
-		    //__enable_irq();
+		    //__enable_irq();,
 
 	gps_push_byte(byte);
 	(void)sr;

@@ -207,7 +207,7 @@ static void test_adc()
 
 }
 
-extern shift_reg_t shift_reg_r;
+
 
 // Состояния алгоритма наведения солнечной панели
 typedef enum {
@@ -232,9 +232,10 @@ uint32_t state_start_time = 0;
 uint32_t max_light_time = 0;
 // Значение максимальной освещённости, обнаруженной фоторезистором
 uint16_t max_light_value = 0;
-
+shift_reg_t shift;
 // Главная функция FSM для запуска процесса наведения
-void SunTrack_Run(void) {
+void SunTrack_Run(shift_reg_t *shift) {
+
     uint32_t now = HAL_GetTick(); // Получаем текущее время
 
     switch (state) {
@@ -245,20 +246,20 @@ void SunTrack_Run(void) {
             break;
 
         case HORIZ_90_START:
-            shift_reg_write_bit_16(&shift_reg_r, 3, 1); // Вращаем по горизонтали вперёд
+            shift_reg_write_bit_8(&shift, 6, 1); // Вращаем по горизонтали вперёд
             state_start_time = now;
             state = HORIZ_90_WAIT;
             break;
 
         case HORIZ_90_WAIT:
-            if (now - state_start_time >= 1000) { // Ожидаем 1 секунду (90°)
-                shift_reg_write_bit_16(&shift_reg_r, 3, 0); // Останавливаем мотор
+            if (now - state_start_time >= 750) { // Ожидаем 1 секунду (90°)
+                shift_reg_write_bit_8(&shift, 6, 0); // Останавливаем мотор
                 state = VERT_SCAN_START;
             }
             break;
 
         case VERT_SCAN_START:
-            shift_reg_write_bit_16(&shift_reg_r, 1, 1); // Вращаем по вертикали вперёд
+            shift_reg_write_bit_8(&shift, 4, 1); // Вращаем по вертикали вперёд
             state_start_time = now;
             max_light_value = 0;
             max_light_time = 0;
@@ -272,10 +273,10 @@ void SunTrack_Run(void) {
                 max_light_time = now - state_start_time;
             }
             // Если прошло 6 секунд — полный оборот
-            if (now - state_start_time >= 6000) {
-                shift_reg_write_bit_16(&shift_reg_r, 1, 0);
+            if (now - state_start_time >= 12500) {
+                shift_reg_write_bit_8(&shift, 4, 0);
                 state_start_time = now;
-                shift_reg_write_bit_16(&shift_reg_r, 2, 1); // Вращаем обратно
+                shift_reg_write_bit_8(&shift, 5, 1); // Вращаем обратно
                 state = VERT_SCAN_BACK;
             }
             break;
@@ -283,13 +284,13 @@ void SunTrack_Run(void) {
         case VERT_SCAN_BACK:
             // Ждём столько, сколько потребовалось, чтобы найти максимум
             if (now - state_start_time >= max_light_time) {
-                shift_reg_write_bit_16(&shift_reg_r, 2, 0);
+                shift_reg_write_bit_8(&shift, 5, 0);
                 state = HORIZ_SCAN_START;
             }
             break;
 
         case HORIZ_SCAN_START:
-            shift_reg_write_bit_16(&shift_reg_r, 3, 1); // Вращаем по горизонтали вперёд
+            shift_reg_write_bit_8(&shift, 6, 1); // Вращаем по горизонтали вперёд
             state_start_time = now;
             max_light_value = 0;
             max_light_time = 0;
@@ -301,17 +302,17 @@ void SunTrack_Run(void) {
                 max_light_value = foto_sp;
                 max_light_time = now - state_start_time;
             }
-            if (now - state_start_time >= 4000) { // Полный оборот по горизонтали
-                shift_reg_write_bit_16(&shift_reg_r, 3, 0);
+            if (now - state_start_time >= 3000) { // Полный оборот по горизонтали
+                shift_reg_write_bit_8(&shift, 6, 0);
                 state_start_time = now;
-                shift_reg_write_bit_16(&shift_reg_r, 4, 1); // Вращаем обратно
+                shift_reg_write_bit_8(&shift, 7, 1); // Вращаем обратно
                 state = HORIZ_SCAN_BACK;
             }
             break;
 
         case HORIZ_SCAN_BACK:
             if (now - state_start_time >= max_light_time) {
-                shift_reg_write_bit_16(&shift_reg_r, 4, 0);
+                shift_reg_write_bit_8(&shift, 7, 0);
                 state = COMPLETE;
             }
             break;
@@ -398,7 +399,7 @@ int app_main(){
 	shift_reg_r.value = 0;
 	shift_reg_init(&shift_reg_r);
 	shift_reg_write_16(&shift_reg_r, 0x0000);
-	shift_reg_write_bit_16(&shift_reg_r, 1, 0);
+	shift_reg_write_bit_8(&shift_reg_r, 1, 0);
 
 //стх и структура лcмa
 	stmdev_ctx_t ctx_lsm;
@@ -487,14 +488,15 @@ int app_main(){
 
 	CCS811_Init();
 
+	shift_reg_write_bit_8(&shift_reg_r, 0, 0);
+
+
 	while(1){
 
-		if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12)){
-			shift_reg_write_bit_16(&shift_reg_r, 1, 1);
-		}
-		else{
-			shift_reg_write_bit_16(&shift_reg_r, 1, 0);
-		}
+		//if(ty == 1){
+		//	SunTrack_Run(&shift_reg_r);
+		//}
+
 
 		start = HAL_GetTick();
 
@@ -614,6 +616,118 @@ int app_main(){
 		int size_pack1 = sizeof(pack1);
 		int size_pack2 = sizeof(pack2);
 
+		int sun  = 0;
+		int oborot = 3000;
+		int oborot1 = 12500;
+
+		float now;
+		float max = 0;
+		float dark = 5000;
+
+		int ty = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
+
+		if(ty == 1){
+			shift_reg_write_bit_16(&shift_reg_r, 1, 1);
+		}
+		else shift_reg_write_bit_16(&shift_reg_r, 1, 0);
+
+		/*
+		if(ty == 1){
+			sun = 2;
+		}
+		else sun = 0;
+		*/
+
+		uint32_t max_time, max_time1;
+		switch(sun){
+			case 1:
+				/*
+				shift_reg_write_bit_16(&shift_reg_r, 6, 1);
+				HAL_Delay(750);
+				shift_reg_write_bit_16(&shift_reg_r, 6, 0);
+
+				max_time1 = HAL_GetTick();
+				shift_reg_write_bit_16(&shift_reg_r, 4, 1);
+				uint32_t start_time1 = HAL_GetTick();
+				while(HAL_GetTick() - start_time1 < oborot1)
+				{
+					test_adc();
+					now = foto_sp;
+					if (now > max)
+					{
+						max = now;
+						max_time1 = HAL_GetTick();
+					}
+				}
+				shift_reg_write_bit_16(&shift_reg_r, 4, 0);
+
+				shift_reg_write_bit_16(&shift_reg_r, 5, 1);
+				HAL_Delay(oborot1-(max_time1 - start_time1));
+				shift_reg_write_bit_16(&shift_reg_r, 5, 0);
+				max = 0;
+				now = 0;
+*/
+				max_time = HAL_GetTick();
+				shift_reg_write_bit_16(&shift_reg_r, 6, 1);
+				uint32_t start_time = HAL_GetTick();
+				while(HAL_GetTick() - start_time < oborot)
+				{
+					test_adc();
+					now = foto_sp;
+					if (now > max)
+					{
+						max = now;
+						max_time = HAL_GetTick();
+					}
+				}
+				shift_reg_write_bit_16(&shift_reg_r, 6, 0);
+
+				shift_reg_write_bit_16(&shift_reg_r, 7, 1);
+				HAL_Delay(oborot-(max_time - start_time));
+				shift_reg_write_bit_16(&shift_reg_r, 7, 0);
+
+				HAL_Delay(5000);
+
+				/*
+				test_adc();
+				dark = foto_sp;
+				if ((dark + 100) < max) {
+					sun = 1;
+				}
+				else sun = 0;
+				*/
+				sun = 0;
+
+			break;
+
+			case 2:
+				shift_reg_write_bit_16(&shift_reg_r, 15, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 9, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 10, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 11, 1);
+
+				HAL_Delay(5000);
+
+				shift_reg_write_bit_16(&shift_reg_r, 15, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 9, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 10, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 11, 0);
+
+				shift_reg_write_bit_16(&shift_reg_r, 8, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 12, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 13, 1);
+				shift_reg_write_bit_16(&shift_reg_r, 14, 1);
+
+				HAL_Delay(10000);
+
+				shift_reg_write_bit_16(&shift_reg_r, 8, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 12, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 13, 0);
+				shift_reg_write_bit_16(&shift_reg_r, 14, 0);
+
+				sun = 0;
+		}
+
 
 		switch(sd_state) {
 			case SD_PACK_1:
@@ -634,15 +748,14 @@ int app_main(){
 				pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
 				if(	HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
+					a++;
 					HAL_UART_Transmit(&huart1, (uint8_t*)&pack1, sizeof(pack1), 100);
-					HAL_Delay(10);
 				}
-			a++;
-			if(a == 4)
-				sd_state = SD_PACK_2;
-			else
-				sd_state = SD_PACK_1;
 
+				if(a >= 4)
+					sd_state = SD_PACK_2;
+				else
+					sd_state = SD_PACK_1;
 			break;
 
 			case SD_PACK_2:
@@ -663,19 +776,17 @@ int app_main(){
 				pack2.time_ms = HAL_GetTick();
 				pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
 
-				if(	HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
+				if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+					a = 0;
+					sd_state = SD_PACK_1;
 					HAL_UART_Transmit(&huart1, (uint8_t*)&pack2, sizeof(pack2), 100);
-					HAL_Delay(10);
 				}
 				else{
 					volatile int x = 0;
 				}
 
-				if(a == 4)
-					sd_state = SD_PACK_2;
-				else
-					sd_state = SD_PACK_1;
-				a=0;
+
+
 			break;
 		}
 

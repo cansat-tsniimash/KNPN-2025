@@ -40,7 +40,7 @@ int ad5593_brd_write(ad5593_board_t * brd, uint8_t addr, uint8_t pointer, uint16
         (data >> 0) & 0xFF
     };
 
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(brd->bus, addr << 1, sequence, sizeof(sequence), HAL_MAX_DELAY);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(brd->bus, addr << 1, sequence, sizeof(sequence), 50);
     if (status != HAL_OK)
     	return 100;
 
@@ -51,7 +51,7 @@ int ad5593_brd_write(ad5593_board_t * brd, uint8_t addr, uint8_t pointer, uint16
 int ad5593_brd_read(ad5593_board_t * brd, uint8_t addr, uint8_t pointer, uint16_t * data)
 {
     uint16_t raw_data;
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(brd->bus, addr << 1, pointer, 1, &raw_data, 2, HAL_MAX_DELAY);
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(brd->bus, addr << 1, pointer, 1, (uint8_t*)&raw_data, 2, 50);
     if (status != HAL_OK)
     	return -1;
 
