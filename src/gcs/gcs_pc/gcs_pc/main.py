@@ -220,9 +220,9 @@ class gcs(QMainWindow):
         self.set_axis(self.ui.Pressure, "Pressure, Pa")
         self.set_axis(self.ui.Height, "Height, m")
         self.set_axis(self.ui.Temperature, "Temperature, C")
-        self.set_axis(self.ui.Gases_consentration, "Gases consentration, ppm")
+        self.set_axis(self.ui.Gases_consentration, "Gases consentration, mV")
         self.set_axis(self.ui.SP_parameters, "SP parameters")
-        self.set_axis(self.ui.Illumination, "Illumination, lx")
+        self.set_axis(self.ui.Illumination, "Illumination, c.u.")
 
         self.legend1 = self.ui.Accelerometer.addLegend()
         self.legend2 = self.ui.Giroscope.addLegend()
@@ -249,10 +249,10 @@ class gcs(QMainWindow):
                                     self.set_line(self.ui.Height,              "#00FF00", "GPS")]
         self.Temperature =         [self.set_line(self.ui.Temperature,         "#0000FF", "Outside"),
                                     self.set_line(self.ui.Temperature,         "#00FF00", "Germo")]
-        self.Gases_consentration = [self.set_line(self.ui.Gases_consentration, "#0000FF", "MICS-6814 CO"),
-                                    self.set_line(self.ui.Gases_consentration, "#00FF00", "MICS-6814 NO2"),
-                                    self.set_line(self.ui.Gases_consentration, "#FF0000", "MICS-6814 NH3"),
-                                    self.set_line(self.ui.Gases_consentration, "#F0F000", "MICS-5524"),
+        self.Gases_consentration = [self.set_line(self.ui.Gases_consentration, "#0000FF", "MICS-5524"),
+                                    self.set_line(self.ui.Gases_consentration, "#00FF00", "MICS-6814 CO"),
+                                    self.set_line(self.ui.Gases_consentration, "#FF0000", "MICS-6814 NO2"),
+                                    self.set_line(self.ui.Gases_consentration, "#F0F000", "MICS-6814 NH3"),
                                     self.set_line(self.ui.Gases_consentration, "#1FF0D5", "CCS811 CO2"),
                                     self.set_line(self.ui.Gases_consentration, "#FF00F0", "CCS811 TVOC")]
         self.SP_parameters =       [self.set_line(self.ui.SP_parameters,       "#0000FF", "Current, A"),
