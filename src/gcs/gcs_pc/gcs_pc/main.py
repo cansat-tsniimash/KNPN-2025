@@ -28,16 +28,18 @@ class DataManager(QtCore.QObject):
     new_pack_2 = QtCore.Signal(list)
     mutex = QtCore.QMutex()
 
+    def reconnect(self):
+        self.udp_socket.sendto(b"h", self.addr)
 
     def start(self):
         host = '192.168.0.203'
         port = 22000
-        addr = (host,port)
+        self.addr = (host,port)
 
-        udp_socket = socket(AF_INET, SOCK_DGRAM)
-        udp_socket.setblocking(False)
-        udp_socket.settimeout(0.1)
-        udp_socket.sendto(b"h", addr)
+        self.udp_socket = socket(AF_INET, SOCK_DGRAM)
+        self.udp_socket.setblocking(False)
+        self.udp_socket.settimeout(0.1)
+        self.udp_socket.bind(("0.0.0.0", 22000))
         data = []
         print("connected")
 
@@ -49,7 +51,7 @@ class DataManager(QtCore.QObject):
 
         while close:
             try:
-                data, addr = udp_socket.recvfrom(53)
+                data, addr = self.udp_socket.recvfrom(53)
             except Exception as e:
                 print(e)
                 pass
@@ -123,11 +125,13 @@ class DataManager(QtCore.QObject):
         self.mutex.lock()
         self.close = False
         self.mutex.unlock()
+        self.udp_socket.close()
 
 
 class gcs(QMainWindow):
     def __init__(self):
         super(gcs, self).__init__()
+        self.show_data = False
         self.load_ui()
 
         self.ui.show()
@@ -154,7 +158,9 @@ class gcs(QMainWindow):
         self.data_thread = QtCore.QThread(self)
         self.data_manager.moveToThread(self.data_thread)
         self.data_thread.started.connect(self.data_manager.start)
+        self.data_thread.start()
 
+        self.ui.Connect.clicked.connect(self.connect_action)
         self.ui.Stop.clicked.connect(self.stop_action)
         self.ui.Start.clicked.connect(self.start_action)
         self.ui.Reset.clicked.connect(self.reset_action)
@@ -168,7 +174,7 @@ class gcs(QMainWindow):
         path = os.path.join(os.path.dirname(__file__), "form.ui")
         ui_file = QtCore.QFile(path)
         ui_file.open(QtCore.QFile.ReadOnly)
-        self.ui = loader.load(ui_file, self)
+        self.ui = loader.load(ui_file, self.centralWidget())
         ui_file.close()
 
     def set_axis(self, plot, name):
@@ -263,81 +269,86 @@ class gcs(QMainWindow):
 
     #@Slot(list)
     def add_new_pack_1(self, unpack_data):
-        self.add_data(self.Accelerometer[0], [unpack_data[2]], [unpack_data[3]*488/1000/1000])
-        self.add_data(self.Accelerometer[1], [unpack_data[2]], [unpack_data[4]*488/1000/1000])
-        self.add_data(self.Accelerometer[2], [unpack_data[2]], [unpack_data[5]*488/1000/1000])
-        self.add_data(self.Giroscope[0], [unpack_data[2]], [unpack_data[6]*70/1000])
-        self.add_data(self.Giroscope[1], [unpack_data[2]], [unpack_data[7]*70/1000])
-        self.add_data(self.Giroscope[2], [unpack_data[2]], [unpack_data[8]*70/1000])
-        self.add_data(self.Magnetometer[0], [unpack_data[2]], [unpack_data[9]/1711])
-        self.add_data(self.Magnetometer[1], [unpack_data[2]], [unpack_data[10]/1711])
-        self.add_data(self.Magnetometer[2], [unpack_data[2]], [unpack_data[11]/1711])
-        self.add_data(self.Temperature[0], [unpack_data[2]], [unpack_data[12]])
-        self.add_data(self.Pressure[0], [unpack_data[2]], [unpack_data[13]])
-        self.add_data(self.Height[0], [unpack_data[2]], [unpack_data[16]])
-        self.add_data(self.Illumination[0], [unpack_data[2]], [unpack_data[17]])
-        self.add_data(self.Illumination[1], [unpack_data[2]], [unpack_data[18]])
+        if self.show_data:
+            self.add_data(self.Accelerometer[0], [unpack_data[2]], [unpack_data[3]*488/1000/1000])
+            self.add_data(self.Accelerometer[1], [unpack_data[2]], [unpack_data[4]*488/1000/1000])
+            self.add_data(self.Accelerometer[2], [unpack_data[2]], [unpack_data[5]*488/1000/1000])
+            self.add_data(self.Giroscope[0], [unpack_data[2]], [unpack_data[6]*70/1000])
+            self.add_data(self.Giroscope[1], [unpack_data[2]], [unpack_data[7]*70/1000])
+            self.add_data(self.Giroscope[2], [unpack_data[2]], [unpack_data[8]*70/1000])
+            self.add_data(self.Magnetometer[0], [unpack_data[2]], [unpack_data[9]/1711])
+            self.add_data(self.Magnetometer[1], [unpack_data[2]], [unpack_data[10]/1711])
+            self.add_data(self.Magnetometer[2], [unpack_data[2]], [unpack_data[11]/1711])
+            self.add_data(self.Temperature[0], [unpack_data[2]], [unpack_data[12]])
+            self.add_data(self.Pressure[0], [unpack_data[2]], [unpack_data[13]])
+            self.add_data(self.Height[0], [unpack_data[2]], [unpack_data[16]])
+            self.add_data(self.Illumination[0], [unpack_data[2]], [unpack_data[17]])
+            self.add_data(self.Illumination[1], [unpack_data[2]], [unpack_data[18]])
 
-        self.ui.Packet1.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
-        self.ui.Packet1.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
-        self.ui.Packet1.setItem(2, 1, QTableWidgetItem(str(unpack_data[3]*488/1000/1000)))
-        self.ui.Packet1.setItem(3, 1, QTableWidgetItem(str(unpack_data[4]*488/1000/1000)))
-        self.ui.Packet1.setItem(4, 1, QTableWidgetItem(str(unpack_data[5]*488/1000/1000)))
-        self.ui.Packet1.setItem(5, 1, QTableWidgetItem(str(unpack_data[6]*70/1000)))
-        self.ui.Packet1.setItem(6, 1, QTableWidgetItem(str(unpack_data[7]*70/1000)))
-        self.ui.Packet1.setItem(7, 1, QTableWidgetItem(str(unpack_data[8]*70/1000)))
-        self.ui.Packet1.setItem(8, 1, QTableWidgetItem(str(unpack_data[9]/1711)))
-        self.ui.Packet1.setItem(9, 1, QTableWidgetItem(str(unpack_data[10]/1711)))
-        self.ui.Packet1.setItem(10, 1, QTableWidgetItem(str(unpack_data[11]/1711)))
-        self.ui.Packet1.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
-        self.ui.Packet1.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
-        self.ui.Packet1.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
-        self.ui.Packet1.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
-        self.ui.Packet1.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
-        self.ui.Packet1.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
-        self.ui.Packet1.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
-        self.ui.Packet1.setItem(18, 1, QTableWidgetItem(str(unpack_data[19])))
+            self.ui.Packet1.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
+            self.ui.Packet1.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
+            self.ui.Packet1.setItem(2, 1, QTableWidgetItem(str(unpack_data[3]*488/1000/1000)))
+            self.ui.Packet1.setItem(3, 1, QTableWidgetItem(str(unpack_data[4]*488/1000/1000)))
+            self.ui.Packet1.setItem(4, 1, QTableWidgetItem(str(unpack_data[5]*488/1000/1000)))
+            self.ui.Packet1.setItem(5, 1, QTableWidgetItem(str(unpack_data[6]*70/1000)))
+            self.ui.Packet1.setItem(6, 1, QTableWidgetItem(str(unpack_data[7]*70/1000)))
+            self.ui.Packet1.setItem(7, 1, QTableWidgetItem(str(unpack_data[8]*70/1000)))
+            self.ui.Packet1.setItem(8, 1, QTableWidgetItem(str(unpack_data[9]/1711)))
+            self.ui.Packet1.setItem(9, 1, QTableWidgetItem(str(unpack_data[10]/1711)))
+            self.ui.Packet1.setItem(10, 1, QTableWidgetItem(str(unpack_data[11]/1711)))
+            self.ui.Packet1.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
+            self.ui.Packet1.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
+            self.ui.Packet1.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
+            self.ui.Packet1.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
+            self.ui.Packet1.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
+            self.ui.Packet1.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
+            self.ui.Packet1.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
+            self.ui.Packet1.setItem(18, 1, QTableWidgetItem(str(unpack_data[19])))
 
 
 
     #@Slot(list)
     def add_new_pack_2(self, unpack_data):
-        self.add_data(self.Height[1], [unpack_data[2]], [unpack_data[6]])
-        self.add_data(self.SP_parameters[0], [unpack_data[2]], [unpack_data[8]])
-        self.add_data(self.SP_parameters[1], [unpack_data[2]], [unpack_data[9]])
-        self.add_data(self.Gases_consentration[0], [unpack_data[2]], [unpack_data[10]])
-        self.add_data(self.Gases_consentration[1], [unpack_data[2]], [unpack_data[11]])
-        self.add_data(self.Gases_consentration[2], [unpack_data[2]], [unpack_data[12]])
-        self.add_data(self.Gases_consentration[3], [unpack_data[2]], [unpack_data[13]])
-        self.add_data(self.Gases_consentration[4], [unpack_data[2]], [unpack_data[14]])
-        self.add_data(self.Gases_consentration[5], [unpack_data[2]], [unpack_data[15]])
-        self.add_data(self.Temperature[1], [unpack_data[2]], [unpack_data[16]])
-        self.add_data(self.Pressure[1], [unpack_data[2]], [unpack_data[17]])
+        if self.show_data:
+            self.add_data(self.Height[1], [unpack_data[2]], [unpack_data[6]])
+            self.add_data(self.SP_parameters[0], [unpack_data[2]], [unpack_data[8]])
+            self.add_data(self.SP_parameters[1], [unpack_data[2]], [unpack_data[9]])
+            self.add_data(self.Gases_consentration[0], [unpack_data[2]], [unpack_data[10]])
+            self.add_data(self.Gases_consentration[1], [unpack_data[2]], [unpack_data[11]])
+            self.add_data(self.Gases_consentration[2], [unpack_data[2]], [unpack_data[12]])
+            self.add_data(self.Gases_consentration[3], [unpack_data[2]], [unpack_data[13]])
+            self.add_data(self.Gases_consentration[4], [unpack_data[2]], [unpack_data[14]])
+            self.add_data(self.Gases_consentration[5], [unpack_data[2]], [unpack_data[15]])
+            self.add_data(self.Temperature[1], [unpack_data[2]], [unpack_data[16]])
+            self.add_data(self.Pressure[1], [unpack_data[2]], [unpack_data[17]])
 
-        self.ui.Packet2.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
-        self.ui.Packet2.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
-        self.ui.Packet2.setItem(2, 1, QTableWidgetItem(str(unpack_data[3])))
-        self.ui.Packet2.setItem(3, 1, QTableWidgetItem(str(unpack_data[4])))
-        self.ui.Packet2.setItem(4, 1, QTableWidgetItem(str(unpack_data[5])))
-        self.ui.Packet2.setItem(5, 1, QTableWidgetItem(str(unpack_data[6])))
-        self.ui.Packet2.setItem(6, 1, QTableWidgetItem(str(unpack_data[7])))
-        self.ui.Packet2.setItem(7, 1, QTableWidgetItem(str(unpack_data[8])))
-        self.ui.Packet2.setItem(8, 1, QTableWidgetItem(str(unpack_data[9])))
-        self.ui.Packet2.setItem(9, 1, QTableWidgetItem(str(unpack_data[10])))
-        self.ui.Packet2.setItem(10, 1, QTableWidgetItem(str(unpack_data[11])))
-        self.ui.Packet2.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
-        self.ui.Packet2.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
-        self.ui.Packet2.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
-        self.ui.Packet2.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
-        self.ui.Packet2.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
-        self.ui.Packet2.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
-        self.ui.Packet2.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
+            self.ui.Packet2.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
+            self.ui.Packet2.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
+            self.ui.Packet2.setItem(2, 1, QTableWidgetItem(str(unpack_data[3])))
+            self.ui.Packet2.setItem(3, 1, QTableWidgetItem(str(unpack_data[4])))
+            self.ui.Packet2.setItem(4, 1, QTableWidgetItem(str(unpack_data[5])))
+            self.ui.Packet2.setItem(5, 1, QTableWidgetItem(str(unpack_data[6])))
+            self.ui.Packet2.setItem(6, 1, QTableWidgetItem(str(unpack_data[7])))
+            self.ui.Packet2.setItem(7, 1, QTableWidgetItem(str(unpack_data[8])))
+            self.ui.Packet2.setItem(8, 1, QTableWidgetItem(str(unpack_data[9])))
+            self.ui.Packet2.setItem(9, 1, QTableWidgetItem(str(unpack_data[10])))
+            self.ui.Packet2.setItem(10, 1, QTableWidgetItem(str(unpack_data[11])))
+            self.ui.Packet2.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
+            self.ui.Packet2.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
+            self.ui.Packet2.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
+            self.ui.Packet2.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
+            self.ui.Packet2.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
+            self.ui.Packet2.setItem(16, 1, QTableWidgetItem(str(unpack_data[17])))
+            self.ui.Packet2.setItem(17, 1, QTableWidgetItem(str(unpack_data[18])))
+
+    def connect_action(self):
+        self.data_manager.reconnect()
 
     def start_action(self):
-        self.data_thread.start()
+        self.show_data = True
 
     def stop_action(self):
-        self.data_manager.stop()
+        self.show_data = False
 
     def reset_action(self):
         all_plot_item_lists = [
@@ -351,6 +362,7 @@ class gcs(QMainWindow):
                     if item: # Check if item is not None
                         # Reset to the initial (0,0) state to match how set_line initializes them
                         item.setData(x=[0], y=[0])
+
 
 if __name__ == "__main__":
     app = QApplication([])

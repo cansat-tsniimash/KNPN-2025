@@ -58,7 +58,7 @@
       <item>
        <widget class="QPushButton" name="Connect">
         <property name="text">
-         <string>Connect</string>
+         <string>Ping</string>
         </property>
        </widget>
       </item>
@@ -461,7 +461,7 @@
          <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
-         <number>27</number>
+         <number>29</number>
         </attribute>
         <attribute name="verticalHeaderHighlightSections">
          <bool>true</bool>
