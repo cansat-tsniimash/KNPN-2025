@@ -263,8 +263,8 @@ class gcs(QMainWindow):
                                     self.set_line(self.ui.Gases_consentration, "#FF00F0", "CCS811 TVOC")]
         self.SP_parameters =       [self.set_line(self.ui.SP_parameters,       "#0000FF", "Current, A"),
                                     self.set_line(self.ui.SP_parameters,       "#00FF00", "Voultage, V")]
-        self.Illumination =        [self.set_line(self.ui.Illumination,        "#0000FF", "SP"),
-                                    self.set_line(self.ui.Illumination,        "#00FF00", "Board")]
+        self.Illumination =        [self.set_line(self.ui.Illumination,        "#0000FF", "Board"),
+                                    self.set_line(self.ui.Illumination,        "#00FF00", "SP")]
         #self.add_data(self.Gases_consentration[0], NumPy.array([5]), NumPy.array([5]))
 
     #@Slot(list)
@@ -281,9 +281,9 @@ class gcs(QMainWindow):
             self.add_data(self.Magnetometer[2], [unpack_data[2]], [unpack_data[11]/1711])
             self.add_data(self.Temperature[0], [unpack_data[2]], [unpack_data[12]])
             self.add_data(self.Pressure[0], [unpack_data[2]], [unpack_data[13]])
-            self.add_data(self.Height[0], [unpack_data[2]], [unpack_data[16]])
-            self.add_data(self.Illumination[0], [unpack_data[2]], [unpack_data[17]])
-            self.add_data(self.Illumination[1], [unpack_data[2]], [unpack_data[18]])
+            self.add_data(self.Height[0], [unpack_data[2]], [unpack_data[15]])
+            self.add_data(self.Illumination[0], [unpack_data[2]], [unpack_data[16]])
+            self.add_data(self.Illumination[1], [unpack_data[2]], [unpack_data[17]])
 
             self.ui.Packet1.setItem(0, 1, QTableWidgetItem(str(unpack_data[1])))
             self.ui.Packet1.setItem(1, 1, QTableWidgetItem(str(unpack_data[2])))
