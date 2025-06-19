@@ -28,6 +28,7 @@
 #include "AD5593/ad5593.h"
 #include "CCS811.h"
 #include "cyclebuffer.h"
+#include <math.h>
 
 extern SPI_HandleTypeDef hspi1;
 //extern SPI_HandleTypeDef hspi4;
@@ -43,6 +44,28 @@ typedef enum
 	SD_PACK_2,
 	SD_WAIT,
 }sd_state_t;
+
+typedef enum
+{
+	STATE_READY,
+	STATE_IN_ROCKET ,
+	PARACHUTE_DESCENT,
+	FALL,
+	LANDING,
+	STATE_OPEN_SP,
+	SUN_SEARCH,
+	ENERGY,
+} state_t;
+
+state_t state_now;
+
+
+typedef struct INA219_DATA{
+	uint16_t power;
+	uint16_t current;
+	uint16_t voltage;
+	uint16_t shunt_voltage;
+}INA219_DATA;
 
 uint16_t Crc16(uint8_t *buf, uint16_t len) {
 	uint16_t crc = 0xFFFF;
@@ -89,8 +112,8 @@ uint16_t sd_parse_to_bytes_pac1(char *buffer, pack1_t *pack1) {
     memset(buffer, 0, 300);
     uint16_t num_written = snprintf(
             buffer, 300,
-			"%d;%d;%d;%d;%d;%ld;%d;%d;%d;%d;%d;%d;%d;%ld;%d;%f;%f;%f;%d;%d;%d\n",
-			pack1->flag,pack1->num,pack1->accl[0],pack1->accl[1],pack1->accl[2],pack1->time_ms,
+			"%d;%d;%ld;%d;%d;%ld;%d;%d;%d;%d;%d;%d;%d;%ld;%d;%f;%f;%f;%d;%d;%d\n",
+			pack1->flag,pack1->num,pack1->time_ms,pack1->accl[0],pack1->accl[1],pack1->accl[2],
 			pack1->gyro[0],pack1->gyro[1],pack1->gyro[2],pack1->mag[0],
 			pack1->mag[1],pack1->mag[2],pack1->bme_temp,pack1->bme_press,pack1->bme_humidity,pack1->bme_height,
 			pack1->lux_board,pack1->lux_sp,pack1->state,pack1->lidar,pack1->crc);
@@ -136,7 +159,7 @@ static int setup_adc()
 	ad5593_an_config_t an_config;
 	an_config.adc_buffer_enable = false;
 	an_config.adc_buffer_precharge = false;
-	an_config.adc_range = AD5593_RANGE_1REF;
+	an_config.adc_range = AD5593_RANGE_2REF;
 	rc = ad5593_an_config(dev, &an_config);
 	if (0 != rc)
 	{
@@ -183,14 +206,22 @@ static void test_adc()
 		ad5593_channel_id_t channel_5 = channels[5];
 
 		ad5593_adc_read(dev, channel_5, &R_MICS_5524);
+		R_MICS_5524 = (((float)R_MICS_5524 * 5)/0xFFF) *1000;
 		ad5593_adc_read(dev, channel_3, &R_MICS_CO);
+		R_MICS_CO = (((float)R_MICS_CO * 5)/0xFFF) *1000;
 		ad5593_adc_read(dev, channel_4, &R_MICS_NO2);
+		R_MICS_NO2 = (((float)R_MICS_NO2 * 5)/0xFFF) *1000;
 		ad5593_adc_read(dev, channel_2, &R_MICS_NH3);
+		R_MICS_NH3 = (((float)R_MICS_NH3 * 5)/0xFFF) *1000;
 
 		uint16_t foto_sp_raw;
 		uint16_t foto_state_raw;
 		ad5593_adc_read(dev, channel_1, &foto_sp_raw);
+		foto_sp_raw = (((float)foto_sp_raw * 5)/0xFFF) *1000;
+
 		ad5593_adc_read(dev, channel_0, &foto_state_raw);
+		foto_state_raw = (((float)foto_state_raw * 5)/0xFFF) *1000;
+
 		foto_sp = foto_sp_raw;
 		foto_state = foto_state_raw;
 
@@ -231,8 +262,9 @@ uint32_t state_start_time = 0;
 // Время (в пределах шага), когда был зафиксирован максимум света
 uint32_t max_light_time = 0;
 // Значение максимальной освещённости, обнаруженной фоторезистором
-uint16_t max_light_value = 0;
+float max_light_value = 0;
 shift_reg_t shift;
+
 // Главная функция FSM для запуска процесса наведения
 void SunTrack_Run(shift_reg_t *shift) {
 
@@ -246,20 +278,20 @@ void SunTrack_Run(shift_reg_t *shift) {
             break;
 
         case HORIZ_90_START:
-            shift_reg_write_bit_8(&shift, 6, 1); // Вращаем по горизонтали вперёд
+            shift_reg_write_bit_16(shift, 6, 1); // Вращаем по горизонтали вперёд
             state_start_time = now;
             state = HORIZ_90_WAIT;
             break;
 
         case HORIZ_90_WAIT:
-            if (now - state_start_time >= 750) { // Ожидаем 1 секунду (90°)
-                shift_reg_write_bit_8(&shift, 6, 0); // Останавливаем мотор
+            if (now - state_start_time >= 750) { // Ожидаем 0.75 секунды (90°)
+                shift_reg_write_bit_16(shift, 6, 0); // Останавливаем мотор
                 state = VERT_SCAN_START;
             }
             break;
 
         case VERT_SCAN_START:
-            shift_reg_write_bit_8(&shift, 4, 1); // Вращаем по вертикали вперёд
+            shift_reg_write_bit_16(shift, 4, 1); // Вращаем по вертикали вперёд
             state_start_time = now;
             max_light_value = 0;
             max_light_time = 0;
@@ -272,25 +304,25 @@ void SunTrack_Run(shift_reg_t *shift) {
                 max_light_value = foto_sp;
                 max_light_time = now - state_start_time;
             }
-            // Если прошло 6 секунд — полный оборот
-            if (now - state_start_time >= 12500) {
-                shift_reg_write_bit_8(&shift, 4, 0);
+            // Если прошло 11,7 секунд — полный оборот
+            if (now - state_start_time >= 11700) {
+                shift_reg_write_bit_16(shift, 4, 0);
                 state_start_time = now;
-                shift_reg_write_bit_8(&shift, 5, 1); // Вращаем обратно
+                shift_reg_write_bit_16(shift, 5, 1); // Вращаем обратно
                 state = VERT_SCAN_BACK;
             }
             break;
 
         case VERT_SCAN_BACK:
             // Ждём столько, сколько потребовалось, чтобы найти максимум
-            if (now - state_start_time >= max_light_time) {
-                shift_reg_write_bit_8(&shift, 5, 0);
+            if (now - state_start_time >= 11700 - max_light_time) {
+                shift_reg_write_bit_16(shift, 5, 0);
                 state = HORIZ_SCAN_START;
             }
             break;
 
         case HORIZ_SCAN_START:
-            shift_reg_write_bit_8(&shift, 6, 1); // Вращаем по горизонтали вперёд
+            shift_reg_write_bit_16(shift, 6, 1); // Вращаем по горизонтали вперёд
             state_start_time = now;
             max_light_value = 0;
             max_light_time = 0;
@@ -303,29 +335,167 @@ void SunTrack_Run(shift_reg_t *shift) {
                 max_light_time = now - state_start_time;
             }
             if (now - state_start_time >= 3000) { // Полный оборот по горизонтали
-                shift_reg_write_bit_8(&shift, 6, 0);
+                shift_reg_write_bit_16(shift, 6, 0);
                 state_start_time = now;
-                shift_reg_write_bit_8(&shift, 7, 1); // Вращаем обратно
+                shift_reg_write_bit_16(shift, 7, 1); // Вращаем обратно
                 state = HORIZ_SCAN_BACK;
             }
             break;
 
         case HORIZ_SCAN_BACK:
-            if (now - state_start_time >= max_light_time) {
-                shift_reg_write_bit_8(&shift, 7, 0);
+            if (now - state_start_time >= 3000 - max_light_time) {
+                shift_reg_write_bit_16(shift, 7, 0);
                 state = COMPLETE;
             }
             break;
 
         case COMPLETE:
-
+        	state_now = ENERGY;
             break;
     }
 }
 
+typedef enum {
+	EMPTY,
+	CALCULATING_ANGLE,
+	SKY_MOTORS_ON,
+	SKY_MOTORS_OFF,
+	GROUND_MOTOR_ON,
+	GROUND_MOTOR_OFF,
+	COMPLETE_BLOOM,
+}OPENING_PETALS;
+
+OPENING_PETALS state_bloom = EMPTY;
+
+const int id_motor[] = {3+8, 2+8, 1+8, 7+8, 6+8, 5+8, 4+8, 0+8};
+
+int target_petals[4] = {0, 1, 2, 3};
+int not_target_petals[4] = {0, 1, 2, 3};
+
+uint32_t bloom_start_time = 0;
+
+int min = 0;
+
+int count_angle(int x, int y){
+	int v_cos = x / (sqrt((x*x)+(y*y)));
+	int v_acos = acos(v_cos);
+
+	if(y < 0){
+		v_acos = 2*M_PI - v_acos;
+	}
+	return v_acos / M_PI * 180;
+}
+
+int bloom(int x, int y,shift_reg_t *shift){
+
+	int min = 0;
+
+	uint32_t now = HAL_GetTick(); // Получаем текущее время
+
+	switch(state_bloom){
+
+		case EMPTY:
+
+			state_bloom = CALCULATING_ANGLE;
+			break;
+
+		case CALCULATING_ANGLE:
+
+			for(int i = 1; i < 8; i++){
+					int dif = abs(count_angle(x,y) - (35 + 45 * i));
+					int dif_min = abs(count_angle(x,y) - (35 + 45 * min));
+
+					if(dif < dif_min){
+						min = i;
+					}
+				}
+
+			target_petals[0] = min + 2;
+			target_petals[1] = min + 1;
+			target_petals[2] = min;
+			target_petals[0] = min - 1;
+
+			not_target_petals[0] = min + 4;
+			not_target_petals[1] = min + 3;
+			not_target_petals[2] = min - 2;
+			not_target_petals[3] = min - 3;
+
+			for(int i = 0; i < 4; i++){
+				if(target_petals[i] < 0)
+					target_petals[i] += 8;
+				if(target_petals[i] > 7)
+					target_petals[i] -= 8;
+				if(not_target_petals[i] < 0)
+					not_target_petals[i] += 8;
+				if(not_target_petals[i] > 7)
+					not_target_petals[i] -= 8;
+			}
+
+			state_bloom = SKY_MOTORS_ON;
+			break;
+
+		case SKY_MOTORS_ON:
+
+			for(int i = 0; i < 4; i++){
+				int motor = target_petals[i];
+				shift_reg_write_bit_16(shift, id_motor[motor], 1);
+			}
+
+			bloom_start_time = now;
+
+			state_bloom = SKY_MOTORS_OFF;
+			break;
+
+		case SKY_MOTORS_OFF:
+
+			if (now - bloom_start_time >= 3000){
+				for(int i = 0; i < 4; i++){
+					int motor = target_petals[i];
+					shift_reg_write_bit_16(shift, id_motor[motor], 0);
+				}
+				state_bloom = GROUND_MOTOR_ON;
+			}
+
+
+			break;
+
+		case GROUND_MOTOR_ON:
+
+			for(int i = 0; i < 4; i++){
+				int motor = not_target_petals[i];
+				shift_reg_write_bit_16(shift, id_motor[motor], 1);
+			}
+
+			bloom_start_time = now;
+
+			state_bloom = GROUND_MOTOR_OFF;
+			break;
+
+		case GROUND_MOTOR_OFF:
+
+			if (now - bloom_start_time >= 3000){
+				for(int i = 0; i < 4; i++){
+					int motor = not_target_petals[i];
+					shift_reg_write_bit_16(shift, id_motor[motor], 0);
+				}
+				state_bloom = COMPLETE_BLOOM;
+			}
+
+			break;
+
+		case COMPLETE_BLOOM:
+			state_now = STATE_OPEN_SP;
+			break;
+	}
+
+}
+
+
 void accept_lidar_byte(uint8_t byte){
 	sbuffer_push(&lidar_buff, byte);
 }
+
+
 
 int app_main(){
 
@@ -353,7 +523,7 @@ int app_main(){
 	if(is_mount == FR_OK) { // монтируете файловую систему по пути SDPath, проверяете, что она смонтировалась, только при этом условии начинаете с ней работать
 		res2csv = f_open(&File_2csv, (char*)path2, FA_WRITE | FA_OPEN_APPEND); // открытие файла, обязательно для работы с ним
 		needs_mount = needs_mount || res2csv != FR_OK;
-		int res2csv2 = f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
+		int res2csv2 = f_puts("flag; num; time_ms; fix; lat; lon; alt; gps_time_s; current; bus_voltage; MICS_5524; MICS_CO; MICS_NO2; MICS_NH3; CCS_CO2; CCS_TVOC; bme_temp_g; bme_press_g; bme_humidity_g; crc\n", &File_2csv);
 		res2csv = f_sync(&File_2csv);
 		needs_mount = needs_mount || res2csv != FR_OK;
 	}
@@ -387,6 +557,11 @@ int app_main(){
 	int fix;
 	uint64_t gps_time_s;
 	uint32_t gps_time_us;
+	float current;
+	float bus_voltage;
+	struct ina219_t ina219;
+
+
 
 
 //сдвиговый регистр
@@ -399,7 +574,8 @@ int app_main(){
 	shift_reg_r.value = 0;
 	shift_reg_init(&shift_reg_r);
 	shift_reg_write_16(&shift_reg_r, 0x0000);
-	shift_reg_write_bit_8(&shift_reg_r, 1, 0);
+	shift_reg_write_bit_16(&shift_reg_r, 1, 0);
+	shift_reg_oe(&shift_reg_r, 0);
 
 //стх и структура лcмa
 	stmdev_ctx_t ctx_lsm;
@@ -475,31 +651,110 @@ int app_main(){
 	HAL_UART_Transmit(&huart1, settings1, sizeof(settings1), 100);
 	HAL_UART_Receive(&huart1, result,  sizeof(result), 100);
 
-
-	test_adc();
-
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, RESET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, RESET);
 
 	huart1.Init.BaudRate = 38400;
 	HAL_UART_Init(&huart1);
 
-	uint16_t co2, tvoc;
+	test_adc();
 
+	ina219_primary_data_t primary_data;
+	ina219_secondary_data_t secondary_data;
+	ina219_init_default(&ina219,&hi2c1,INA219_I2CADDR_A1_GND_A0_GND, HAL_MAX_DELAY);
+
+
+	uint16_t co2, tvoc;
 	CCS811_Init();
 
-	shift_reg_write_bit_8(&shift_reg_r, 0, 0);
+
+
+
+	state_now = STATE_READY;
+/*
+    shift_reg_write_bit_16(&shift_reg_r, 6, 1); // Вращаем по горизонтали вперёд
+    HAL_Delay(3000);
+    shift_reg_write_bit_16(&shift_reg_r, 6, 0); // Вращаем по горизонтали вперёд
+    shift_reg_write_bit_16(&shift_reg_r, 4, 1); // Вращаем по вертикали вперёд
+    HAL_Delay(11700);
+    shift_reg_write_bit_16(&shift_reg_r, 4, 0); // Вращаем по вертикали вперёд
+*/
+
+
+	// переменные гермообъёма
+	static uint32_t last_activation_time = 0;
+	static uint8_t valve_open = 0;
+
+	// переменные для состояний
+	float foto_state_out, foto_state_in;
+	uint32_t start_time_luxes = 0;
+	uint32_t incinerator_parashute = 0;
+	uint32_t incinerator_sp = 0;
+	uint32_t time_motor = 0;
+	float height_old = 200.0;
+	bool flag_foto = 1;
+	bool flag_incinerator_sp = 1;
+	int count_height = 0;
+
+
+
+
 
 
 	while(1){
 
-		//if(ty == 1){
-		//	SunTrack_Run(&shift_reg_r);
-		//}
-
-
 		start = HAL_GetTick();
 
+		//работа гермообъёма срабатывание каждые 15 секунд на 5 секунд
+		uint32_t current_time = HAL_GetTick();
+
+		if (!valve_open && (current_time - last_activation_time >= 15000))
+		{
+		    // Открыть клапан
+		    shift_reg_write_bit_16(&shift_reg_r, 0, 1);
+		    valve_open = 1;
+		    last_activation_time = current_time; // время открытия
+		}
+		else if (valve_open && (current_time - last_activation_time >= 5000))
+		{
+		    // Закрыть клапан
+		    shift_reg_write_bit_16(&shift_reg_r, 0, 0);
+		    valve_open = 0;
+		    last_activation_time = current_time; // сброс на следующий цикл
+		}
+
+
+		int knopka  = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
+		/*
+		if(knopka  == 1){
+			//HAL_Delay(5000);
+
+			shift_reg_write_bit_16(&shift_reg_r, 15, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 9, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 10, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 11, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 8, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 12, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 13, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 14, 1);
+
+			//shift_reg_write_bit_16(&shift_reg_r, 0, 1);
+
+		}
+		else{
+			shift_reg_write_bit_16(&shift_reg_r, 15, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 9, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 10, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 11, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 8, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 12, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 13, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 14, 0);
+
+			//shift_reg_write_bit_16(&shift_reg_r, 0, 0);
+		}
+
+*/
 
 
 		if(is_mount != FR_OK) {
@@ -582,6 +837,28 @@ int app_main(){
 		//uint16_t crc_lidar = lidar[0] + lidar[0] + lidar[1] + lidar[0] + lidar[1] + lidar[2] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[0] + lidar[1] + lidar[2] + lidar[3] + lidar[4] + lidar[5] + lidar[6] + lidar[7];
 		//uint16_t crc_lidar_8 = crc_lidar & 0x00FF;
 
+		int res_ina219 = ina219_read_primary(&ina219,&primary_data);
+		if (res_ina219 == 2)
+		{
+			I2C_ClearBusyFlagErratum(&hi2c1, 20);
+		}
+		res_ina219 = ina219_read_secondary(&ina219,&secondary_data);
+		if (res_ina219 == 2)
+		{
+			I2C_ClearBusyFlagErratum(&hi2c1, 20);
+		}
+
+
+
+		current = ina219_current_convert(&ina219, secondary_data.current);
+		const float power = ina219_power_convert(&ina219, secondary_data.power);
+		const float busv = power / current;
+
+		bus_voltage = ina219_bus_voltage_convert(&ina219, primary_data.busv);
+
+		test_adc();
+
+
 		pack1.flag = 0xAA;
 		pack1.bme_height = height;
 		pack1.bme_humidity = bmp_humidity;
@@ -590,7 +867,7 @@ int app_main(){
 		pack1.lidar = lidar_1;
 		pack1.lux_board = foto_state;
 		pack1.lux_sp = foto_sp;
-		pack1.state = 0;
+		pack1.state = state_now;
 		pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
 
@@ -609,128 +886,25 @@ int app_main(){
 		pack2.bme_humidity_g = bme2_shit.humidity;
 		pack2.bme_press_g = bme2_shit.pressure;
 		pack2.bme_temp_g = bme2_shit.temperature;
-		pack2.bus_voltage = 666;
-		pack2.current = 666;
+		pack2.bus_voltage = bus_voltage;
+		pack2.current = current;
 
 
 		int size_pack1 = sizeof(pack1);
 		int size_pack2 = sizeof(pack2);
 
-		int sun  = 0;
-		int oborot = 3000;
-		int oborot1 = 12500;
 
-		float now;
-		float max = 0;
-		float dark = 5000;
 
-		int ty = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
 
-		if(ty == 1){
-			shift_reg_write_bit_16(&shift_reg_r, 1, 1);
-		}
-		else shift_reg_write_bit_16(&shift_reg_r, 1, 0);
-
-		/*
-		if(ty == 1){
-			sun = 2;
-		}
-		else sun = 0;
-		*/
-
-		uint32_t max_time, max_time1;
-		switch(sun){
-			case 1:
-				/*
-				shift_reg_write_bit_16(&shift_reg_r, 6, 1);
-				HAL_Delay(750);
-				shift_reg_write_bit_16(&shift_reg_r, 6, 0);
-
-				max_time1 = HAL_GetTick();
-				shift_reg_write_bit_16(&shift_reg_r, 4, 1);
-				uint32_t start_time1 = HAL_GetTick();
-				while(HAL_GetTick() - start_time1 < oborot1)
-				{
-					test_adc();
-					now = foto_sp;
-					if (now > max)
-					{
-						max = now;
-						max_time1 = HAL_GetTick();
-					}
-				}
-				shift_reg_write_bit_16(&shift_reg_r, 4, 0);
-
-				shift_reg_write_bit_16(&shift_reg_r, 5, 1);
-				HAL_Delay(oborot1-(max_time1 - start_time1));
-				shift_reg_write_bit_16(&shift_reg_r, 5, 0);
-				max = 0;
-				now = 0;
-*/
-				max_time = HAL_GetTick();
-				shift_reg_write_bit_16(&shift_reg_r, 6, 1);
-				uint32_t start_time = HAL_GetTick();
-				while(HAL_GetTick() - start_time < oborot)
-				{
-					test_adc();
-					now = foto_sp;
-					if (now > max)
-					{
-						max = now;
-						max_time = HAL_GetTick();
-					}
-				}
-				shift_reg_write_bit_16(&shift_reg_r, 6, 0);
-
-				shift_reg_write_bit_16(&shift_reg_r, 7, 1);
-				HAL_Delay(oborot-(max_time - start_time));
-				shift_reg_write_bit_16(&shift_reg_r, 7, 0);
-
-				HAL_Delay(5000);
-
-				/*
-				test_adc();
-				dark = foto_sp;
-				if ((dark + 100) < max) {
-					sun = 1;
-				}
-				else sun = 0;
-				*/
-				sun = 0;
-
-			break;
-
-			case 2:
-				shift_reg_write_bit_16(&shift_reg_r, 15, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 9, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 10, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 11, 1);
-
-				HAL_Delay(5000);
-
-				shift_reg_write_bit_16(&shift_reg_r, 15, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 9, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 10, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 11, 0);
-
-				shift_reg_write_bit_16(&shift_reg_r, 8, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 12, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 13, 1);
-				shift_reg_write_bit_16(&shift_reg_r, 14, 1);
-
-				HAL_Delay(10000);
-
-				shift_reg_write_bit_16(&shift_reg_r, 8, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 12, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 13, 0);
-				shift_reg_write_bit_16(&shift_reg_r, 14, 0);
-
-				sun = 0;
-		}
 
 
 		switch(sd_state) {
 			case SD_PACK_1:
+
+				pack1.num++;
+				pack1.time_ms = HAL_GetTick();
+				pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
+
 				if (res1csv == FR_OK){
 					num_written = sd_parse_to_bytes_pac1(str_buf, &pack1);
 
@@ -743,9 +917,6 @@ int app_main(){
 					if (pack1.num % 50 == 0)
 						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 				}
-				pack1.num++;
-				pack1.time_ms = HAL_GetTick();
-				pack1.crc = Crc16((uint8_t *)&pack1, sizeof(pack1) - 2);
 
 				if(	HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){
 					a++;
@@ -759,6 +930,11 @@ int app_main(){
 			break;
 
 			case SD_PACK_2:
+
+				pack2.num++;
+				pack2.time_ms = HAL_GetTick();
+				pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
+
 				if (res2csv == FR_OK){
 					num_written = sd_parse_to_bytes_pac2(str_buf, &pack2);
 
@@ -772,10 +948,6 @@ int app_main(){
 						resb = f_sync(&File_b); // запись в файл (на sd контроллер пишет не сразу, а по закрытии файла. Также можно использовать эту команду)
 				}
 
-				pack2.num++;
-				pack2.time_ms = HAL_GetTick();
-				pack2.crc = Crc16((uint8_t *)&pack2, sizeof(pack2) - 2);
-
 				if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
 					a = 0;
 					sd_state = SD_PACK_1;
@@ -785,14 +957,105 @@ int app_main(){
 					volatile int x = 0;
 				}
 
-
-
 			break;
 		}
 
+
+		switch(state_now){
+			case STATE_READY:
+				if(knopka == 1){
+					bmp_press = bme_shit.pressure;
+					test_adc();
+					foto_state_out = foto_state;
+					state_now = STATE_IN_ROCKET;
+					start_time_luxes = HAL_GetTick();
+				}
+			break;
+
+			case STATE_IN_ROCKET:
+
+				if (HAL_GetTick()-start_time_luxes >= 8000){
+					shift_reg_write_bit_16(&shift_reg_r, 1, 1);
+				}
+				if (HAL_GetTick()-start_time_luxes >= 10000){
+					shift_reg_write_bit_16(&shift_reg_r, 1, 0);
+					if(flag_foto == 1){
+						test_adc();
+						foto_state_in = foto_state;
+						flag_foto = 0;
+					}
+					else{
+						test_adc();
+						if(foto_state >= ((foto_state_out - foto_state_in) * 0.5 + foto_state_in)){
+							state_now = PARACHUTE_DESCENT;
+						}
+
+					}
+
+				}
+			break;
+
+			case PARACHUTE_DESCENT:
+				if(height <= 2.0){
+					if(lidar_1 <= 20){
+						state_now = FALL;
+						shift_reg_write_16(&shift_reg_r, 0xFF00);
+						shift_reg_write_bit_16(&shift_reg_r, 3, 1);
+						incinerator_parashute = HAL_GetTick();
+						time_motor = HAL_GetTick();
+					}
+				}
+			break;
+
+			case FALL:
+				if(HAL_GetTick() - incinerator_parashute >= 1000){
+					shift_reg_write_bit_16(&shift_reg_r, 3, 0);
+				}
+				if(HAL_GetTick() - time_motor >= 500){
+					shift_reg_write_16(&shift_reg_r, 0x0000);
+				}
+				if(height_old - height <= 1.5){
+					count_height ++;
+					height_old = height;
+				}
+				else{
+					count_height = 0;
+					height_old = height;
+				}
+				if (count_height == 10)
+					state_now = LANDING;
+
+				break;
+
+			case LANDING:
+				bloom(acc_g[0], acc_g[1], &shift_reg_r);
+				break;
+
+			case STATE_OPEN_SP:
+				shift_reg_write_bit_16(&shift_reg_r, 2, 1);
+				incinerator_sp = HAL_GetTick();
+				state_now = SUN_SEARCH;
+				break;
+
+			case SUN_SEARCH:
+				if((HAL_GetTick() - incinerator_sp >= 1000) && flag_incinerator_sp == 1){
+					shift_reg_write_bit_16(&shift_reg_r, 2, 0);
+					flag_incinerator_sp = 0;
+				}
+
+				SunTrack_Run(&shift_reg_r);
+				break;
+
+			case ENERGY:
+				shift_reg_write_bit_16(&shift_reg_r, 1, 1);
+				state_now = ENERGY;
+				break;
+		}
+
+
 		stop = HAL_GetTick();
 		uint32_t delta = stop - start;
-		printf("delta = %u\n", delta);
+		printf("delta = %ld\n", delta);
 	}
 
 	return 0;

@@ -194,9 +194,6 @@ void ina219_deinit(ina219_t * device);
 /*! После резета следует подождать FIXME сколько времени) */
 int ina219_sw_reset(ina219_t * device);
 
-//! Запись калибровочного регистра
-int ina219_set_cal(ina219_t * device, float current_lsb, float shunt_r);
-
 //! Установка параметров конфигурации устойства
 /*! И сохранение параметров в дескрипторе */
 int ina219_set_cfg(ina219_t * device, const ina219_cfg_t * cfg);

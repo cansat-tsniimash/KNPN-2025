@@ -249,6 +249,8 @@ int ad5593_adc_read(ad5593_t * device, ad5593_channel_id_t channel, uint16_t * v
     if (0 != rc)
         return rc;
 
+    HAL_Delay(10);
+
     uint16_t buffer;
     ad5593_channel_id_t in_channel;
     rc = ad5593_adc_auto_read(device, &in_channel, &buffer);
