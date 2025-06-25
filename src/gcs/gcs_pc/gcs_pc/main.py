@@ -14,6 +14,7 @@ from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 
 import numpy as NumPy
+import math
 
 import time
 
@@ -310,13 +311,24 @@ class gcs(QMainWindow):
     #@Slot(list)
     def add_new_pack_2(self, unpack_data):
         if self.show_data:
+            R0_5524 = 4444
+            R0_6814_CO = 418151
+            R0_6814_NO2 = 29600
+            R0_6814_NH3 = 30650
             self.add_data(self.Height[1], [unpack_data[2]], [unpack_data[6]])
             self.add_data(self.SP_parameters[0], [unpack_data[2]], [unpack_data[8]])
             self.add_data(self.SP_parameters[1], [unpack_data[2]], [unpack_data[9]])
-            self.add_data(self.Gases_consentration[0], [unpack_data[2]], [unpack_data[10]])
-            self.add_data(self.Gases_consentration[1], [unpack_data[2]], [unpack_data[11]])
-            self.add_data(self.Gases_consentration[2], [unpack_data[2]], [unpack_data[12]])
-            self.add_data(self.Gases_consentration[3], [unpack_data[2]], [unpack_data[13]])
+
+            y_CO_5524 = ((10000 * unpack_data[10])/(3.3 - (unpack_data[10] / 1000)))/R0_5524
+            y_CO_6814 = ((10000 * unpack_data[11])/(3.3 - (unpack_data[10] / 1000)))/R0_6814_CO
+            self.add_data(self.Gases_consentration[0], [unpack_data[2]], [4.5094139420749839545/y_CO_5524**1.1729399483804680851])
+            self.add_data(self.Gases_consentration[1], [unpack_data[2]], [4.5094139420749839545/y_CO_6814**1.1729399483804680851])
+
+            y_NO2 = ((10000 * unpack_data[12])/(3.3 - (unpack_data[12] / 1000)))/R0_6814_NO2
+            self.add_data(self.Gases_consentration[2], [unpack_data[2]], [0.16240122845736334614*y_NO2**0.97846644245673148509])
+
+            y_NH3 = ((10000 * unpack_data[13])/(3.3 - (unpack_data[13] / 1000)))/R0_6814_NH3
+            self.add_data(self.Gases_consentration[3], [unpack_data[2]], [0.63849852577435507858/y_NH3**1.860835538460201907])
             self.add_data(self.Gases_consentration[4], [unpack_data[2]], [unpack_data[14]])
             self.add_data(self.Gases_consentration[5], [unpack_data[2]], [unpack_data[15]])
             self.add_data(self.Temperature[1], [unpack_data[2]], [unpack_data[16]])
@@ -331,10 +343,10 @@ class gcs(QMainWindow):
             self.ui.Packet2.setItem(6, 1, QTableWidgetItem(str(unpack_data[7])))
             self.ui.Packet2.setItem(7, 1, QTableWidgetItem(str(unpack_data[8])))
             self.ui.Packet2.setItem(8, 1, QTableWidgetItem(str(unpack_data[9])))
-            self.ui.Packet2.setItem(9, 1, QTableWidgetItem(str(unpack_data[10])))
-            self.ui.Packet2.setItem(10, 1, QTableWidgetItem(str(unpack_data[11])))
-            self.ui.Packet2.setItem(11, 1, QTableWidgetItem(str(unpack_data[12])))
-            self.ui.Packet2.setItem(12, 1, QTableWidgetItem(str(unpack_data[13])))
+            self.ui.Packet2.setItem(9, 1, QTableWidgetItem(str(math.log10(y_CO_5524/3.04)/math.log10(0.81))))
+            self.ui.Packet2.setItem(10, 1, QTableWidgetItem(str(math.log10(y_CO_6814/3.04)/math.log10(0.81))))
+            self.ui.Packet2.setItem(11, 1, QTableWidgetItem(str(math.log10(y_NO2/3.1)/math.log10(1.53))))
+            self.ui.Packet2.setItem(12, 1, QTableWidgetItem(str(math.log10(y_NH3/0.34)/math.log10(0.98))))
             self.ui.Packet2.setItem(13, 1, QTableWidgetItem(str(unpack_data[14])))
             self.ui.Packet2.setItem(14, 1, QTableWidgetItem(str(unpack_data[15])))
             self.ui.Packet2.setItem(15, 1, QTableWidgetItem(str(unpack_data[16])))
