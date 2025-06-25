@@ -305,7 +305,7 @@ void SunTrack_Run(shift_reg_t *shift) {
                 max_light_time = now - state_start_time;
             }
             // Если прошло 11,7 секунд — полный оборот
-            if (now - state_start_time >= 11700) {
+            if (now - state_start_time >= 10450) {
                 shift_reg_write_bit_16(shift, 4, 0);
                 state_start_time = now;
                 shift_reg_write_bit_16(shift, 5, 1); // Вращаем обратно
@@ -315,7 +315,7 @@ void SunTrack_Run(shift_reg_t *shift) {
 
         case VERT_SCAN_BACK:
             // Ждём столько, сколько потребовалось, чтобы найти максимум
-            if (now - state_start_time >= 11700 - max_light_time) {
+            if (now - state_start_time >= 10450 - max_light_time) {
                 shift_reg_write_bit_16(shift, 5, 0);
                 state = HORIZ_SCAN_START;
             }
@@ -350,7 +350,7 @@ void SunTrack_Run(shift_reg_t *shift) {
             break;
 
         case COMPLETE:
-        	state_now = ENERGY;
+        	//state_now = ENERGY;
             break;
     }
 }
@@ -455,8 +455,6 @@ int bloom(int x, int y,shift_reg_t *shift){
 				}
 				state_bloom = GROUND_MOTOR_ON;
 			}
-
-
 			break;
 
 		case GROUND_MOTOR_ON:
@@ -691,19 +689,25 @@ int app_main(){
 	uint32_t incinerator_parashute = 0;
 	uint32_t incinerator_sp = 0;
 	uint32_t time_motor = 0;
+	uint32_t time_motor_lepestok = 0;
 	float height_old = 200.0;
 	bool flag_foto = 1;
 	bool flag_incinerator_sp = 1;
+	bool flag_lepestok = 0;
 	int count_height = 0;
 
 
+/*
+    shift_reg_write_bit_16(&shift_reg_r, 4, 1); // Вращаем по вертикали вперёд
+    HAL_Delay(10450);
+    shift_reg_write_bit_16(&shift_reg_r, 4, 0); // Вращаем по вертикали вперёд
+*/
 
 
 
 
 	while(1){
 
-		start = HAL_GetTick();
 
 		//работа гермообъёма срабатывание каждые 15 секунд на 5 секунд
 		uint32_t current_time = HAL_GetTick();
@@ -855,8 +859,10 @@ int app_main(){
 		const float busv = power / current;
 
 		bus_voltage = ina219_bus_voltage_convert(&ina219, primary_data.busv);
+		start = HAL_GetTick();
 
 		test_adc();
+		//SunTrack_Run(&shift_reg_r);
 
 
 		pack1.flag = 0xAA;
@@ -1011,7 +1017,7 @@ int app_main(){
 				if(HAL_GetTick() - incinerator_parashute >= 1000){
 					shift_reg_write_bit_16(&shift_reg_r, 3, 0);
 				}
-				if(HAL_GetTick() - time_motor >= 500){
+				if(HAL_GetTick() - time_motor >= 200){
 					shift_reg_write_16(&shift_reg_r, 0x0000);
 				}
 				if(height_old - height <= 1.5){
@@ -1028,13 +1034,25 @@ int app_main(){
 				break;
 
 			case LANDING:
-				bloom(acc_g[0], acc_g[1], &shift_reg_r);
+				//bloom(acc_g[0], acc_g[1], &shift_reg_r);
+				shift_reg_write_16(&shift_reg_r, 0xFF00);
+				time_motor_lepestok = HAL_GetTick();
+				state_now = STATE_OPEN_SP;
+
+
 				break;
 
 			case STATE_OPEN_SP:
-				shift_reg_write_bit_16(&shift_reg_r, 2, 1);
-				incinerator_sp = HAL_GetTick();
-				state_now = SUN_SEARCH;
+				if(HAL_GetTick() - time_motor_lepestok >= 3000){
+					shift_reg_write_16(&shift_reg_r, 0x0000);
+					flag_lepestok = 1;
+				}
+				if(flag_lepestok == 1){
+					shift_reg_write_bit_16(&shift_reg_r, 2, 1);
+					incinerator_sp = HAL_GetTick();
+
+					state_now = SUN_SEARCH;
+				}
 				break;
 
 			case SUN_SEARCH:
