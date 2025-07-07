@@ -263,6 +263,9 @@ uint32_t state_start_time = 0;
 uint32_t max_light_time = 0;
 // Значение максимальной освещённости, обнаруженной фоторезистором
 float max_light_value = 0;
+
+int flag_paneli = 0;
+
 shift_reg_t shift;
 
 // Главная функция FSM для запуска процесса наведения
@@ -322,11 +325,23 @@ void SunTrack_Run(shift_reg_t *shift) {
             break;
 
         case HORIZ_SCAN_START:
-            shift_reg_write_bit_16(shift, 6, 1); // Вращаем по горизонтали вперёд
-            state_start_time = now;
-            max_light_value = 0;
-            max_light_time = 0;
-            state = HORIZ_SCAN_WAIT;
+        	if(flag_paneli == 0){
+        		shift_reg_write_bit_16(shift, 7, 1); // Вращаем обратно
+        		state_start_time = now;
+                flag_paneli = 2;
+        	}
+            if (now - state_start_time >= 750) { // Ожидаем 0.75 секунды (90°)
+            	shift_reg_write_bit_16(shift, 7, 0); // Останавливаем мотор
+                flag_paneli = 1;
+            }
+            if(flag_paneli == 1){
+            	shift_reg_write_bit_16(shift, 6, 1); // Вращаем по горизонтали вперёд
+            	state_start_time = now;
+            	max_light_value = 0;
+            	max_light_time = 0;
+            	state = HORIZ_SCAN_WAIT;
+            }
+
             break;
 
         case HORIZ_SCAN_WAIT:
@@ -350,7 +365,7 @@ void SunTrack_Run(shift_reg_t *shift) {
             break;
 
         case COMPLETE:
-        	//state_now = ENERGY;
+        	state_now = ENERGY;
             break;
     }
 }
@@ -630,7 +645,7 @@ int app_main(){
 	//uint8_t settings_speed[] = {0xC0, 0x02, 0x01, 0x65};
 	//uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x17};
 	uint8_t settings_channel[] = {0xC0, 0x04, 0x01, 0x28};
-	uint8_t settings_speed_uartrate[] = {0xC0, 0x02, 0x01, 0xA5};
+	uint8_t settings_speed_uartrate[] = {0xC0, 0x02, 0x01, 0xA2};//A5
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, SET);
@@ -697,11 +712,9 @@ int app_main(){
 	int count_height = 0;
 
 
-/*
-    shift_reg_write_bit_16(&shift_reg_r, 4, 1); // Вращаем по вертикали вперёд
-    HAL_Delay(10450);
-    shift_reg_write_bit_16(&shift_reg_r, 4, 0); // Вращаем по вертикали вперёд
-*/
+
+
+
 
 
 
@@ -729,7 +742,7 @@ int app_main(){
 
 
 		int knopka  = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12);
-		/*
+/*
 		if(knopka  == 1){
 			//HAL_Delay(5000);
 
@@ -742,10 +755,11 @@ int app_main(){
 			shift_reg_write_bit_16(&shift_reg_r, 13, 1);
 			shift_reg_write_bit_16(&shift_reg_r, 14, 1);
 
-			//shift_reg_write_bit_16(&shift_reg_r, 0, 1);
+			shift_reg_write_bit_16(&shift_reg_r, 0, 1);
 
 		}
 		else{
+
 			shift_reg_write_bit_16(&shift_reg_r, 15, 0);
 			shift_reg_write_bit_16(&shift_reg_r, 9, 0);
 			shift_reg_write_bit_16(&shift_reg_r, 10, 0);
@@ -755,10 +769,10 @@ int app_main(){
 			shift_reg_write_bit_16(&shift_reg_r, 13, 0);
 			shift_reg_write_bit_16(&shift_reg_r, 14, 0);
 
-			//shift_reg_write_bit_16(&shift_reg_r, 0, 0);
+			shift_reg_write_bit_16(&shift_reg_r, 0, 0);
 		}
-
 */
+
 
 
 		if(is_mount != FR_OK) {
@@ -806,7 +820,7 @@ int app_main(){
 		gps_get_time(&cookie, &gps_time_s, &gps_time_us);
 
 
-		CCS811_SetEnvironmentalData(45.0, 24.0); // 45% RH, 24°C
+		CCS811_SetEnvironmentalData(bme2_shit.humidity, bme2_shit.temperature); // 45% RH, 24°C
 
 		if (CCS811_DataAvailable())
 		{
@@ -1002,8 +1016,8 @@ int app_main(){
 			break;
 
 			case PARACHUTE_DESCENT:
-				if(height <= 2.0){
-					if(lidar_1 <= 20){
+				if(height <= 15.0){
+					if(lidar_1 <= 400){
 						state_now = FALL;
 						shift_reg_write_16(&shift_reg_r, 0xFF00);
 						shift_reg_write_bit_16(&shift_reg_r, 3, 1);
